@@ -1,0 +1,59 @@
+name: Publish user handbook
+
+on:
+  push:
+    branches: [user-guide]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: personal-pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    if: github.ref == 'refs/heads/user-guide'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run check:code-blocks && npm run check:assets && npm run typecheck
+      - run: npm run build:pages
+      - name: Check published navigation
+        run: |
+          repo_name="${GITHUB_REPOSITORY#*/}"
+          owner="${GITHUB_REPOSITORY%/*}"
+          base_url="/$repo_name/"
+          if [ "${repo_name,,}" = "${owner,,}.github.io" ]; then base_url="/"; fi
+          python3 scripts/check-built-links.py build-pages --base-url "$base_url"
+          python3 scripts/check-legacy-urls.py build-pages
+          test -s build-pages/search-index.json
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: build-pages
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4

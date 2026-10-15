@@ -1,0 +1,17 @@
+book/
+theme/highlight.js
+mermaid.min.js
+mermaid-init.js
+.DS_Store
+logs/
+node_modules/
+build/
+build-pages/
+offline/
+.docusaurus/
+.venv-api/
+__pycache__/
+*.py[cod]
+
+# Locally generated API docs (rustdoc/Sphinx). Built fresh by CI for Pages.
+src/api/
