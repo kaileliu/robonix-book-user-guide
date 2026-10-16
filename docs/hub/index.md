@@ -7,7 +7,7 @@ last_update:
 
 [Hub](https://hub.robonix.ai/discover)提供目录和云端备份；Console 管理机器人本机的配置与运行。
 
-第一次使用时，先按[安装与连接路线](../integration-guide/index.md)完成 Console 安装、配置与运行，再连接 Client。还没有机器人时，可先[在线体验](../getting-started/online-demo.md)或[运行 TIAGo 仿真](../getting-started/simulation.md)。
+第一次使用时，先按[安装与连接路线](../integration-guide/index.md)完成 Console 安装、配置与运行，再连接 Client。还没有机器人时，直接从[运行 TIAGo 仿真](../getting-started/simulation.md)开始。
 
 ## 运行后的日常管理
 

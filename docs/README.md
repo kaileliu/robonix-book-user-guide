@@ -65,7 +65,7 @@ flowchart TD
 
 | 你要做什么 | 阅读内容 |
 |---|---|
-| 先熟悉配置界面 | [在线体验](getting-started/online-demo.md) |
+| 没有实体机器人，先完成一遍使用流程 | [运行 TIAGo 仿真](getting-started/simulation.md) |
 | 与机器人对话、下达任务，或进行建图与导航 | [Client 使用指南](getting-started/client.md)、[机器人任务](tasks/index.md) |
 | 切换部署、查看历史、备份分享或更新 | [日常管理](hub/index.md) |
 | 排查问题、查阅术语 | [问题排查](troubleshooting/index.md)、[常用概念](concepts/glossary.md) |

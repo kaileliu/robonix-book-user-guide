@@ -112,7 +112,7 @@ const config: Config = {
         {
           title: '快速入口',
           items: [
-            {label: '在线体验', to: '/getting-started/online-demo'},
+            {label: '运行 TIAGo 仿真', to: '/getting-started/simulation'},
             {label: '使用我的机器人', to: '/integration-guide'},
             {label: '问题排查', to: '/troubleshooting'},
             {label: '开发与进阶适配', to: '/development'},

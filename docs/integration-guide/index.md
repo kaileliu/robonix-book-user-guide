@@ -14,7 +14,7 @@ last_update:
 
 打开 [Hub 机器人目录](https://hub.robonix.ai/discover/robot)，浏览或[搜索型号](https://hub.robonix.ai/discover?kind=robot)。查看条目说明和仓库 README，确认型号、传感器、运行环境与你的设备一致。
 
-没有真机？可先[体验页面](../getting-started/online-demo.md)，或[运行 TIAGo 仿真](../getting-started/simulation.md)。
+没有真机？可直接[运行 TIAGo 仿真](../getting-started/simulation.md)。
 
 ## 按顺序完成安装与连接
 

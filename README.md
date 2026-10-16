@@ -72,14 +72,13 @@ not work. A local copy is also available at `offline/robonix-book/index.html`.
 The export includes relative file links, the complete sidebar, offline text
 search, images, Mermaid diagrams, platform tabs, and code copying. It uses a
 separate static runtime compatible with `file://`; the ordinary production
-`build/` directory still targets HTTP hosting. Hub, GitHub, online demos, and
-the separately generated Rust/Python API reference require internet access;
+`build/` directory still targets HTTP hosting. Hub, GitHub, and the separately
+generated Rust/Python API reference require internet access;
 API links are marked “在线”. Regenerate the ZIP after changing the handbook.
 
 ## Contributing
 
 Read the [documentation contribution guide](docs/contributing/documentation.md) and [writing standard](STYLE.md) before changing technical instructions. Commands, configuration fields, paths, expected output, and implementation status must be verified against the exact Robonix source revision described by the page.
-
 
 ## License
 

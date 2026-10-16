@@ -4,13 +4,7 @@ import type {SidebarsConfig} from '@docusaurus/plugin-content-docs';
 const sidebars: SidebarsConfig = {
   handbook: [
     {type: 'doc', id: 'home', label: '认识 Robonix'},
-    {
-      type: 'category', label: '快速体验',
-      items: [
-        'getting-started/online-demo',
-        'getting-started/simulation',
-      ],
-    },
+    'getting-started/simulation',
     {
       type: 'category', label: '安装与连接',
       link: {type: 'doc', id: 'integration-guide/index'},

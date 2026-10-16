@@ -113,7 +113,7 @@ writeFileSync(join(output, '打开说明.txt'), [
   '2. 双击 index.html，使用 Chrome、Edge、Firefox 或 Safari 打开。',
   '3. 分享时发送整个 ZIP；不要只发送 index.html。', '',
   '阅读手册、目录跳转、全文搜索、图表和图片不需要网络或本地服务器。',
-  'Hub、GitHub、在线体验及标有“在线”的 API 参考链接需要联网。',
+  'Hub、GitHub 及标有“在线”的 API 参考链接需要联网。',
   '本离线包不包含独立生成的 Rust/Python API 文档。', '',
   `导出时间：${new Date().toISOString()}`,
   `手册页面：${index.length}`,
