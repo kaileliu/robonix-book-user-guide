@@ -7,6 +7,19 @@ last_update:
 
 没有真机，也能在电脑里运行 TIAGo 仿真：先在 Console 启动，再用 Client 完成一次相机任务。
 
+## 本章导览
+
+本章按“先跑通，再扩展”的顺序组织：
+
+| 你要做什么 | 阅读入口 | 这页解决什么问题 |
+|---|---|---|
+| 第一次使用 Robonix | 本页 | 用 Hub 安装 TIAGo Webots 配置，完成仿真和第一条任务 |
+| 接入新的仿真本体 | [接入 MuJoCo 仿真本体](../integration-guide/mujoco-simulation-onboarding.md) | 把厂商提供的 MuJoCo 工程或机器人模型接入 Robonix |
+| 使用命令行完整部署 Webots | [Webots 命令行部署](quickstart.md) | 不依赖 Console，从源码构建、启动和排查 Webots |
+| 在特定平台运行仿真 | [x86 仿真 + LoongArch](x86-ubuntu-la-arch/README.md)、[x86 仿真 + ARM64](jetson-x86-webots/README.md) | 把仿真和另一台计算设备分开部署 |
+
+这几页解决的问题不同：本页是使用者的最短路径，MuJoCo 页面是接入新仿真本体的开发路径，其他页面是命令行或特定硬件平台的部署变体。按自己的目标选择即可。
+
 ## 准备电脑
 
 先查看 [Hub 中的 TIAGo 配置](https://hub.robonix.ai/package/robonix.robot.pal_robotics.tiago_webots)及其 README。[原 Webots 教程](quickstart.md)记录的完整验收路径使用 Ubuntu 22.04 或 Debian 13、`x86_64`、NVIDIA 图形环境和 Docker；按[主机检查](quickstart.md#1-检查主机)准备工具与设备权限。

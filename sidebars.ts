@@ -13,12 +13,12 @@ const sidebars: SidebarsConfig = {
         {type: 'doc', id: 'getting-started/simulation', label: '运行 TIAGo 仿真'},
         {
           type: 'category',
-          label: '仿真部署',
+          label: '仿真部署与扩展',
           items: [
+            {type: 'doc', id: 'integration-guide/mujoco-simulation-onboarding', label: '接入 MuJoCo 仿真本体'},
             {type: 'doc', id: 'getting-started/quickstart', label: 'Webots 命令行部署'},
             {type: 'doc', id: 'getting-started/x86-ubuntu-la-arch/README', label: 'x86 仿真 + LoongArch 部署'},
             {type: 'doc', id: 'getting-started/jetson-x86-webots/README', label: 'x86 仿真 + ARM64 部署'},
-            {type: 'doc', id: 'integration-guide/mujoco-simulation-onboarding', label: '接入 MuJoCo 仿真本体'},
           ],
         },
       ],
@@ -100,6 +100,7 @@ const sidebars: SidebarsConfig = {
     {
       type: 'category',
       label: '原理与参考',
+      link: {type: 'doc', id: 'architecture/index'},
       items: [
         {
           type: 'category',
@@ -169,6 +170,7 @@ const sidebars: SidebarsConfig = {
     {
       type: 'category',
       label: '附录与维护',
+      link: {type: 'doc', id: 'appendix/index'},
       items: [
         'troubleshooting/index',
         'concepts/glossary',

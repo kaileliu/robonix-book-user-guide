@@ -246,6 +246,81 @@ pre {
   line-height: 1.55;
 }
 
+.home-architecture-figure {
+  margin: 1.5rem 0 2rem;
+  padding: 0.8rem;
+  background: color-mix(in srgb, var(--ifm-background-color) 94%, #6478d8 6%);
+  border: 1px solid color-mix(in srgb, var(--ifm-font-color-base) 16%, transparent);
+  border-radius: 0.65rem;
+}
+
+.home-architecture-figure img {
+  display: block;
+  width: 100%;
+  max-height: 34rem;
+  object-fit: contain;
+  border-radius: 0.35rem;
+}
+
+.home-architecture-figure figcaption {
+  margin: 0.7rem 0.25rem 0.1rem;
+  color: color-mix(in srgb, var(--ifm-font-color-base) 75%, transparent);
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+
+.home-route-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin: 1.4rem 0 2rem;
+}
+
+.home-route-card {
+  display: grid;
+  grid-template-columns: minmax(8rem, 34%) 1fr;
+  gap: 1rem;
+  align-items: center;
+  padding: 0.8rem;
+  color: inherit !important;
+  text-decoration: none !important;
+  background: color-mix(in srgb, var(--ifm-background-color) 94%, #6478d8 6%);
+  border: 1px solid color-mix(in srgb, var(--ifm-font-color-base) 16%, transparent);
+  border-left: 4px solid var(--ifm-color-primary);
+  border-radius: 0.55rem;
+  transition: border-color 120ms ease, transform 120ms ease, box-shadow 120ms ease;
+}
+
+.home-route-card:hover {
+  border-color: var(--ifm-color-primary);
+  box-shadow: 0 0.55rem 1.2rem rgba(24, 37, 89, 0.12);
+  transform: translateY(-2px);
+}
+
+.home-route-card img {
+  display: block;
+  width: 100%;
+  height: 7.2rem;
+  object-fit: cover;
+  border-radius: 0.35rem;
+}
+
+.home-route-card__title,
+.home-route-card__text {
+  display: block;
+}
+
+.home-route-card__title {
+  margin-bottom: 0.35rem;
+  font-size: 1.12rem;
+  font-weight: 700;
+}
+
+.home-route-card__text {
+  color: color-mix(in srgb, var(--ifm-font-color-base) 78%, transparent);
+  line-height: 1.55;
+}
+
 .procedure-meta {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -277,7 +352,8 @@ pre {
   }
 
   .task-grid,
-  .procedure-meta {
+  .procedure-meta,
+  .home-route-grid {
     grid-template-columns: 1fr;
   }
 }
