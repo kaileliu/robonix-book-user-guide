@@ -60,8 +60,6 @@ flowchart TD
 - **认知：运行 Robonix 的计算设备。** PC、服务器、Jetson Orin 等设备承载 Robonix，负责理解任务、发现能力、结合环境和本体状态安排执行步骤。计算设备可以装在机器人上，也可以通过网络与机器人连接。
 - **执行：完成动作的机器人本体。** 小车、机器狗、人形机器人、机械臂等本体，通过已经适配的底盘、关节和末端执行器移动、观察和操作。
 
-这三部分是角色上的区分，不要求一定是三台独立设备。一台机器人可以同时包含感知设备、计算设备和执行本体；也可以让 PC 或服务器承担认知部分，再通过网络连接机器人。需要把计算设备和仿真环境分开部署时，可参考 [Orin 与 x86 分布式部署](getting-started/jetson-x86-webots/README.md)。平台条件见[项目的平台说明](https://github.com/syswonder/robonix#host-platforms)，具体机器人型号、依赖和已验证能力以 [Hub 机器人目录](https://hub.robonix.ai/discover)中的条目为准。
-
 <span id="选择起点"></span>
 <span id="按使用阶段阅读"></span>
 
