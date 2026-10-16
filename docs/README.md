@@ -24,11 +24,6 @@ Robonix 覆盖从仿真到实体机器人的完整过程：可以先在 Webots�
 
 项目定位、应用场景和系统架构见 [Robonix 官网](https://robonix.ai/)，源码、快速上手和设计说明见 [Robonix GitHub 仓库](https://github.com/syswonder/robonix)。
 
-<figure className="home-architecture-figure">
-  <img src="architecture/robonix-arch.png" alt="Robonix 从用户任务到机器人硬件的系统架构图" />
-  <figcaption>先只看这条主线：用户提出任务，Robonix 理解并规划，执行器调用服务和硬件能力，机器人返回状态与结果。图中的系统组件会在“原理与参考”中逐一介绍。</figcaption>
-</figure>
-
 ## Robonix 如何把任务变成动作
 
 你可以把一次任务理解为一条从“想做什么”到“机器人做了什么”的链路：
@@ -50,7 +45,7 @@ flowchart LR
 
 ## 感知、认知与执行
 
-下面的“感知—认知—执行”是本手册帮助第一次读者理解设备分工的一种看法，不是 Robonix 的正式组件名称，也不要求准备三台设备。记住一句话就够了：**感知设备收集信息，运行 Robonix 的计算设备理解和安排任务，机器人本体把任务变成动作。**
+从用户最容易理解的硬件角色看，可以把 Robonix 连接的设备分为“感知—认知—执行”三个部分：
 
 ```mermaid
 flowchart TD
@@ -65,9 +60,7 @@ flowchart TD
 - **认知：运行 Robonix 的计算设备。** PC、服务器、Jetson Orin 等设备承载 Robonix，负责理解任务、发现能力、结合环境和本体状态安排执行步骤。计算设备可以装在机器人上，也可以通过网络与机器人连接。
 - **执行：完成动作的机器人本体。** 小车、机器狗、人形机器人、机械臂等本体，通过已经适配的底盘、关节和末端执行器移动、观察和操作。
 
-以一台带相机和雷达的小车为例：相机和雷达负责观察，车上的 PC、服务器或 Orin 运行 Robonix，底盘和电机负责移动。三部分可以装在同一台机器人上；也可以让独立的 PC 或服务器运行 Robonix，通过网络连接远处的传感器和机器人本体。
-
-本手册中的 [Orin 与 x86 分布式部署](getting-started/jetson-x86-webots/README.md)就是后一种部署示例，它说明计算设备和仿真环境如何分开协作，并不是每个使用者都必须采用的配置。平台条件见[项目的平台说明](https://github.com/syswonder/robonix#host-platforms)，具体机器人型号、依赖和已验证能力以 [Hub 机器人目录](https://hub.robonix.ai/discover)中的条目为准。
+这三部分是角色上的区分，不要求一定是三台独立设备。一台机器人可以同时包含感知设备、计算设备和执行本体；也可以让 PC 或服务器承担认知部分，再通过网络连接机器人。需要把计算设备和仿真环境分开部署时，可参考 [Orin 与 x86 分布式部署](getting-started/jetson-x86-webots/README.md)。平台条件见[项目的平台说明](https://github.com/syswonder/robonix#host-platforms)，具体机器人型号、依赖和已验证能力以 [Hub 机器人目录](https://hub.robonix.ai/discover)中的条目为准。
 
 <span id="选择起点"></span>
 <span id="按使用阶段阅读"></span>
@@ -86,27 +79,6 @@ flowchart TD
 
 - **已有适用的整机配置**：进入[安装并连接机器人](integration-guide/index.md)，依次完成安装、配置、构建启动和客户端连接。
 - **尚未找到适用配置**：进入[开发适配](development/robot-support.md)，接入硬件能力、组织整机配置并验证运行。
-
-<div className="home-route-grid">
-  <a className="home-route-card" href="getting-started/simulation">
-    <img src="img/webots/office.jpg" alt="Webots 办公室仿真场景" />
-    <span className="home-route-card__title">没有实体机器人</span>
-    <span className="home-route-card__text">先运行 TIAGo 仿真，再在仿真中完成任务、开发功能或接入新的仿真本体。</span>
-  </a>
-  <a className="home-route-card" href="integration-guide">
-    <img src="img/hub/robot-catalog.png" alt="Hub 机器人目录中的型号搜索" />
-    <span className="home-route-card__title">已有实体机器人</span>
-    <span className="home-route-card__text">先在 Hub 查型号和依赖；有可用配置就安装连接，没有就进入开发适配。</span>
-  </a>
-</div>
-
-## 一条主线读完整本手册
-
-1. **先认识 Robonix。** 了解模型、能力、计算设备和机器人本体各自负责什么。
-2. **选择起点。** 没有实体机器人就运行仿真；已有机器人就先到 [Hub 目录](https://hub.robonix.ai/discover)确认支持情况。
-3. **完成一次任务。** 按对应路线安装配置，连接 Client，先做一次简单的观察或对话任务。
-4. **继续使用或开始开发。** 使用建图、导航和场景功能，或者进入[开发与扩展](development/index.md)编写软件包、适配机器人。
-5. **遇到问题再查参考。** 日常管理看 Hub 指南，系统边界和接口细节看[原理与参考](architecture/index.md)，异常处理看[附录与维护](appendix/index.md)。
 
 <span id="运行之后"></span>
 
