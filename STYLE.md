@@ -13,7 +13,7 @@ This repository uses Chinese for the user-facing book. Keep identifiers, command
 
 ## Use verified technical language
 
-- Preserve verified source behavior and limits when editing user instructions.
+- For the user handbook, preserve the behavior and limits documented in the local Robonix Hub beta.22 PDF first, then the original book. Record source sections and corrections in `maintainer-notes/factual-audit.md`.
 - Use current Hub pages to verify destinations and visible labels. Identify later-version additions explicitly; do not silently mix them into the PDF workflow or infer working tasks from a package name.
 - Preserve prerequisites, destructive effects, failure behavior, and version scope when shortening text. A source conflict must be recorded and resolved explicitly, not smoothed over.
 - Verify commands with the target commit's CLI help or actual execution.

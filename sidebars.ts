@@ -18,6 +18,7 @@ const sidebars: SidebarsConfig = {
             {type: 'doc', id: 'getting-started/quickstart', label: 'Webots 命令行部署'},
             {type: 'doc', id: 'getting-started/x86-ubuntu-la-arch/README', label: 'x86 仿真 + LoongArch 部署'},
             {type: 'doc', id: 'getting-started/jetson-x86-webots/README', label: 'x86 仿真 + ARM64 部署'},
+            {type: 'doc', id: 'integration-guide/mujoco-simulation-onboarding', label: '接入 MuJoCo 仿真本体'},
           ],
         },
       ],
@@ -51,7 +52,6 @@ const sidebars: SidebarsConfig = {
           items: [
             'development/robot-support',
             'integration-guide/vendor-onboarding',
-            {type: 'doc', id: 'integration-guide/mujoco-simulation-onboarding', label: 'MuJoCo 仿真本体接入'},
           ],
         },
       ],
@@ -172,6 +172,7 @@ const sidebars: SidebarsConfig = {
       items: [
         'troubleshooting/index',
         'concepts/glossary',
+        {type: 'doc', id: 'appendix/admin-console', label: '管理后台（管理员）'},
         {type: 'doc', id: 'contributing/robonix', label: '贡献 Robonix 代码'},
         {type: 'doc', id: 'contributing/documentation', label: '维护文档'},
       ],

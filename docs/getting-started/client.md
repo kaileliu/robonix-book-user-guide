@@ -209,10 +209,3 @@ Client 启动时会自动启动本机音频服务。按以下顺序检查：
 Linux / macOS 可用 `nc -vz ROBOT_HOST 50051` 检查默认 Atlas 端口；将地址与端口换成 Console 显示的实际值。更多现象见[问题排查](../troubleshooting/index.md)。
 
 下一步：按[第一条任务](first-task.md)完成一次相机观察；已经验证通过后，可继续[机器人任务](../tasks/index.md)。
-
-<details>
-<summary>Client 版本</summary>
-
-安装示例对应 Client 源码版本 [`739f8499`](https://github.com/syswonder/robonix-client/tree/739f8499)。
-
-</details>

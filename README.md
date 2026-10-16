@@ -1,6 +1,6 @@
 # Robonix Book
 
-Robonix Book is the Chinese user and developer handbook for Robonix. It covers online exploration, Robonix Hub and Console, robot operation, common tasks, troubleshooting, and advanced integration. The site is built with Docusaurus. Source-level reference pages are aligned with pinned `dev` revision [`223675d9a5000e70debae4f2512404cec5c9c442`](https://github.com/syswonder/robonix/tree/223675d9a5000e70debae4f2512404cec5c9c442). The archived mdBook source and tooling remain under `archive/mdbook/` for history and URL migration checks; contributors should edit the Markdown files under `docs/`.
+Robonix Book is the Chinese user and developer handbook for Robonix. It covers simulation, Robonix Hub and Console, robot operation, common tasks, troubleshooting, and advanced integration. The site is built with Docusaurus. Source-level reference pages are aligned with pinned `dev` revision [`223675d9a5000e70debae4f2512404cec5c9c442`](https://github.com/syswonder/robonix/tree/223675d9a5000e70debae4f2512404cec5c9c442). The archived mdBook source and tooling remain under `archive/mdbook/` for history and URL migration checks; contributors should edit the Markdown files under `docs/`.
 
 ## Local preview
 
@@ -83,5 +83,3 @@ Read the [documentation contribution guide](docs/contributing/documentation.md) 
 ## License
 
 Robonix Book is licensed under the [Mulan Permissive Software License, Version 2](LICENSE). Notices for incorporated third-party source files are listed in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
-
-This edition is based on [syswonder/robonix-book](https://github.com/syswonder/robonix-book) and retains its license and notices.

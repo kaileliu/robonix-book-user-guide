@@ -25,4 +25,4 @@ last_update:
 | 部署清单 | 记录要启动的组件、软件包和参数的 `robonix_manifest.yaml` |
 | `rbnx` | Robonix 的命令行工具 |
 
-目录中的功能是否适用，以机器人型号、依赖和 README 为准。截图中的旧名称见[界面名称对照](../README.md#界面名称与版本)。
+目录中的功能是否适用，以机器人型号、依赖和 README 为准；页面入口以当前 Console 和 Hub 的显示为准。

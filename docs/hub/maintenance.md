@@ -37,6 +37,8 @@ Console 在启动时和此后每 6 小时检查更新。自动更新会下载、
 | 可以登录的账户 | 每行一个邮箱；留空表示任何账户都能登录 |
 | 部署 | [新建、切换、重命名和删除](deployments.md) |
 
+![Console 设置页中的模型变量、网络访问和部署目录](/img/hub/console-settings.png)
+
 ## 重新安装或卸载
 
 再次执行[安装命令](install.md#在目标机器安装)即可重新安装，部署与版本历史会保留。许可协议未变时，不再询问。
@@ -48,5 +50,19 @@ curl -fsSL https://hub.robonix.ai/install | bash -s -- --uninstall
 ```
 
 卸载会停止并删除管理程序的服务，保留部署、历史和日志。卸载不等于删除机器人配置。
+
+如果需要重新查看许可协议，执行：
+
+```bash
+curl -fsSL https://hub.robonix.ai/install | bash -s -- --show-eula
+```
+
+无人值守安装前先阅读 [许可协议](https://hub.robonix.ai/download/EULA.md)，再使用：
+
+```bash
+curl -fsSL https://hub.robonix.ai/install | bash -s -- --accept-eula
+```
+
+只有明确接受协议后才使用无人值守参数。
 
 版本变化见 [Hub 更新日志](https://hub.robonix.ai/changelog)。页面无法使用时，先查[服务状态](https://hub.robonix.ai/status)，再按[问题排查](../troubleshooting/index.md)处理。

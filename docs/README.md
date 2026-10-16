@@ -14,17 +14,38 @@ last_update:
 
 ## 什么是 Robonix
 
-**Robonix 是面向具身智能的开源智能体操作系统。** 它把 AI 模型、机器人技能、软件服务和硬件能力组织在一起，让机器人理解人的任务，并调用自己具备的能力去完成任务。
+**Robonix 是面向具身智能的开源智能体操作系统。** 它把模型、技能、软件服务和机器人硬件组织成可以发现、组合和复用的能力，让兼容的任务能力能够在不同的机器人形态上复用。
 
-你用自然语言说明目标，Robonix 结合机器人的能力、周围环境和身体状态，通过大语言模型与视觉语言模型生成任务程序。这个程序可以检查，运行过程可以查看，也可以取消任务；对于指定的任务结果，还可以配置验证。
+普通的机器人应用往往和某个型号、某套驱动紧紧绑在一起：换一台机器人，就要重新连接硬件、重写功能，再重新调试。Robonix 把这几部分拆开处理：相机、雷达、底盘、机械臂等硬件先提供标准能力；建图、导航、语音等服务调用这些能力；技能把多个能力组合成面向任务的动作；上层模型再根据人的目标选择和安排它们。
 
-Robonix 也让机器人软件更容易复用。相机、底盘、机械臂等硬件通过统一接口提供能力，建图、导航和技能在这些接口之上组合。硬件适配与上层功能开发由此分开，兼容的能力可以在不同机器人之间复用。你既可以使用已有功能，也可以在仿真中开发技能，再适配到实体机器人。
+对使用者来说，Robonix 更像一个机器人“大脑系统”。你可以用自然语言说出目标，系统结合当前机器人的能力、周围环境和本体状态，生成一组可检查的任务步骤并执行。执行中的计划可以观察、调整或取消；需要确认结果的任务，还可以配置结果验证。任务、技能、服务和硬件之间通过能力约定连接，兼容的能力可以跨机器人复用，但每台机器人仍需满足自己的硬件、软件和配置条件。
 
-项目介绍与完整设计见 [Robonix 官网](https://robonix.ai/)和[源码仓库](https://github.com/syswonder/robonix)。
+Robonix 覆盖从仿真到实体机器人的完整过程：可以先在 Webots、MuJoCo 等仿真环境里熟悉任务流程和开发技能，再把经过验证的能力部署到适配的实体机器人上。它也支持场景理解、建图、导航、自然语言交互和可复用技能的组合。
+
+项目定位、应用场景和系统架构见 [Robonix 官网](https://robonix.ai/)，源码、快速上手和设计说明见 [Robonix GitHub 仓库](https://github.com/syswonder/robonix)。
+
+## Robonix 如何把任务变成动作
+
+你可以把一次任务理解为一条从“想做什么”到“机器人做了什么”的链路：
+
+```mermaid
+flowchart LR
+    U["人的目标<br/>例如：去房间拍一张照片"] --> R["Robonix<br/>理解任务、查看能力与环境、安排步骤"]
+    R --> C[调用兼容的技能、服务与硬件能力]
+    C --> A[机器人执行动作]
+    A --> F[返回状态、结果与环境反馈]
+    F --> R
+```
+
+- **先理解目标。** 你提供的是任务目标，而不是某个厂商 SDK 的调用顺序。
+- **再查看条件。** Robonix 会根据当前已注册的能力、机器人本体状态和环境信息组织任务。
+- **最后执行并反馈。** 任务步骤会进入执行器，运行状态和结果可以在 Client 或命令行中查看。
+
+因此，Robonix 既可以承接自然语言任务，也可以承接传统控制程序和可复用技能。具体的组件职责、通信方式和接口定义见[原理与参考](architecture/components.md)。
 
 ## 感知、认知与执行
 
-从硬件看，可以按“感知—认知—执行”三个层次，认识 Robonix 连接的外设、计算设备和机器人本体：
+从用户最容易理解的硬件角色看，可以把 Robonix 连接的设备分为“感知—认知—执行”三个部分：
 
 ```mermaid
 flowchart TD
@@ -35,11 +56,11 @@ flowchart TD
     C <-->|动作与反馈| E
 ```
 
-- **感知：与环境交互的外设。** 相机提供画面，雷达测量周围空间，麦克风接收声音，扬声器播放声音。
-- **认知：部署 Robonix 的计算设备。** PC、服务器或 Jetson Orin 等设备运行 Robonix，结合模型理解任务、组织机器人能力。
-- **执行：完成动作的机器人本体。** 小车、机器狗、人形机器人等，通过已适配的底盘、关节或机械臂完成移动与操作。
+- **感知：相机、雷达、麦克风等外设。** 相机提供画面，雷达测量周围空间，麦克风接收声音；扬声器负责把机器人的反馈传达给人。这些设备是机器人观察环境和与人交互的入口。
+- **认知：运行 Robonix 的计算设备。** PC、服务器、Jetson Orin 等设备承载 Robonix，负责理解任务、发现能力、结合环境和本体状态安排执行步骤。计算设备可以装在机器人上，也可以通过网络与机器人连接。
+- **执行：完成动作的机器人本体。** 小车、机器狗、人形机器人、机械臂等本体，通过已经适配的底盘、关节和末端执行器移动、观察和操作。
 
-这三层描述硬件的不同角色，不要求分成三台独立设备。计算设备可以在机器人上，也可以通过网络连接；部署示例见 [Orin 与 x86 分布式部署](getting-started/jetson-x86-webots/README.md)。具体运行环境见[项目的平台说明](https://github.com/syswonder/robonix#host-platforms)，机器人型号和依赖以 [Hub 机器人目录](https://hub.robonix.ai/discover/robot)为准。
+这三部分是角色上的区分，不要求一定是三台独立设备。一台机器人可以同时包含感知设备、计算设备和执行本体；也可以让 PC 或服务器承担认知部分，再通过网络连接机器人。需要把计算设备和仿真环境分开部署时，可参考 [Orin 与 x86 分布式部署](getting-started/jetson-x86-webots/README.md)。平台条件见[项目的平台说明](https://github.com/syswonder/robonix#host-platforms)，具体机器人型号、依赖和已验证能力以 [Hub 机器人目录](https://hub.robonix.ai/discover)中的条目为准。
 
 <span id="选择起点"></span>
 <span id="按使用阶段阅读"></span>
@@ -48,16 +69,16 @@ flowchart TD
 
 ### 没有实体机器人：从仿真开始
 
-先跟随[运行 TIAGo 仿真](getting-started/simulation.md)，在电脑中启动机器人、连接客户端，完成一次相机任务。
+先跟随[运行 TIAGo 仿真](getting-started/simulation.md)，在电脑中启动一台虚拟机器人，连接 Client，完成一次相机任务。仿真不需要实体机器人，适合第一次了解 Robonix、验证配置和开发功能。
 
-跑通后，可以沿[软件包开发指南](developer-guide.md)添加原语、服务或技能，在仿真中验证自己的功能。需要接入新的仿真本体时，进入 [MuJoCo 仿真本体接入](integration-guide/mujoco-simulation-onboarding.md)。
+跑通后，可以沿[软件包开发指南](developer-guide.md)添加原语、服务或技能，在仿真中验证自己的功能。要接入厂商提供的仿真本体，进入 [MuJoCo 仿真本体接入](integration-guide/mujoco-simulation-onboarding.md)。
 
 ### 已有实体机器人：先确认是否支持
 
-在 [Hub 机器人目录](https://hub.robonix.ai/discover/robot)查找型号，核对条目说明和 README 中的硬件、依赖与运行环境，再选择下一步：
+先打开 [Hub 机器人目录](https://hub.robonix.ai/discover)，搜索自己的型号，核对条目说明、使用的软件包、README、硬件、依赖和运行环境，再选择下一步：
 
 - **已有适用的整机配置**：进入[安装并连接机器人](integration-guide/index.md)，依次完成安装、配置、构建启动和客户端连接。
-- **你的机器人尚未适配**：进入[开发适配](development/robot-support.md)，接入硬件能力、组织整机配置并验证运行。
+- **尚未找到适用配置**：进入[开发适配](development/robot-support.md)，接入硬件能力、组织整机配置并验证运行。
 
 <span id="运行之后"></span>
 
@@ -70,12 +91,13 @@ flowchart TD
 | 切换部署、查看历史、备份分享或更新 | [日常管理](hub/index.md) |
 | 排查问题、查阅术语 | [问题排查](troubleshooting/index.md)、[常用概念](concepts/glossary.md) |
 | 开发软件包、适配本体、配置多平台部署 | [开发与进阶适配](development/index.md) |
-| 理解系统组件，查找接口与 API | [工作原理](architecture/components.md)、[接口目录](interface-catalog/index.md)、[自动生成的参考](reference/index.md) |
+| 理解系统组件，查找接口与 API | [工作原理](architecture/components.md)、[接口目录](interface-catalog/index.md)、[参考资料](reference/index.md) |
+| 管理账户、反馈、目录同步和服务设置 | [管理后台（管理员）](appendix/admin-console.md) |
 
 <span id="三步让机器人工作"></span>
 
 <details id="三个工具各做什么">
-<summary>手册中用到的 Hub、Console 与 Client</summary>
+<summary>Hub、Console 与 Client 分别做什么</summary>
 
 | 工具 | 用途 | 在哪里使用 |
 |---|---|---|
@@ -83,29 +105,6 @@ flowchart TD
 | [Console](hub/index.md) | 管理机器人的工作台：改配置、启动、看日志 | 安装在机器人主机上，用浏览器打开 |
 | [Client](getting-started/first-task.md) | 与机器人的对话窗口：发任务、看进度 | 操作者电脑，可与机器人共用一台 |
 
-Console 的配置助手用来改参数；让机器人拍照、执行任务，则使用 Client。
-
-</details>
-
-<span id="本手册的版本范围"></span>
-
-<details id="界面名称与版本">
-<summary>界面名称与版本</summary>
-
-部分截图中的名称与当前界面不同，可按下表找到对应入口：
-
-| 截图中的名称 | 当前界面名称 |
-|---|---|
-| 本机 Robonix Hub | Robonix Console |
-| 云端 Robonix Hub Cloud | Robonix Hub |
-| 部署 / 版本 | 配置 / 历史 |
-| 本机环境变量 / 云端副本 | 机器人环境变量 / 云端备份 |
-| 安装到本机 / 添加到本机 | 安装到这台机器人 / 添加到这台机器人 |
-
-名称和 Hub 链接按 2026-10-14 的公开页面核对。后续新增功能以对应版本的[更新日志](https://hub.robonix.ai/changelog)为准。
-
-开发示例对应 Robonix 源码 [`223675d9`](https://github.com/syswonder/robonix/tree/223675d9a5000e70debae4f2512404cec5c9c442)，由 `ROBONIX_SOURCE_REVISION` 记录。Client 安装示例对应源码 `739f8499`；独立建图、导航等软件包的版本见各自指南。
-
-安装 Hub 整机条目时，仍需核对该条目版本的 README 和依赖。
+Console 的配置助手用来检查和修改配置；让机器人拍照、执行任务，则使用 Client。
 
 </details>

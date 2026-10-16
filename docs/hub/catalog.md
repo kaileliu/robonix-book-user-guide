@@ -13,9 +13,20 @@ last_update:
 
 例如，[TIAGo Webots](https://hub.robonix.ai/package/robonix.robot.pal_robotics.tiago_webots) 是仿真配置；同名真机需要自己的适配。目录中的软件包链接可以继续查看具体功能和依赖。
 
+<details>
+<summary>查看机器人条目与安装确认</summary>
+
+![Hub 中的机器人条目搜索结果](/img/hub/hub-robot-catalog-detail.png)
+
+![机器人条目的说明、版本和使用的软件包](/img/hub/hub-robot-package.png)
+
+*先看条目的型号和运行方式，再确认安装。*
+
+</details>
+
 ![Hub 机器人目录：选择分类并搜索型号](/img/hub/robot-catalog.png)
 
-*在 Hub [搜索 TIAGo](https://hub.robonix.ai/discover?kind=robot&q=tiago)的结果，2026-10-14。*
+*在 Hub [搜索 TIAGo](https://hub.robonix.ai/discover?kind=robot&q=tiago)的结果。*
 
 ## 在 Console 安装
 
@@ -26,6 +37,10 @@ last_update:
 ![Console 机器人目录中的整机安装按钮](/img/hub/console-install-robot.png)
 
 *截图中的“安装到本机”（1），在当前界面叫“安装到这台机器人”。*
+
+![确认整机配置安装内容](/img/hub/console-install-confirm.png)
+
+*确认框会列出将下载的清单、本机软件包、配置文件和仿真脚本。*
 
 整机自带的本机软件包、配置文件和仿真脚本会一起下载。当前部署为空时放入其中；已有配置时，会新建部署并切换过去。远程软件包随后在“更新”页下载、构建。
 
@@ -42,7 +57,17 @@ Hub 网站用于查找和阅读；安装操作在机器人自己的 Console 中�
 
 *点能力树中的节点，查看该能力的用途和定义。是否适用，仍需核对软件包的说明与依赖。*
 
+能力详情会显示传输方式、版本、接口文件和定义方，并按数据流向列出输入、输出或发布/订阅消息。字段包含类型、名称和注释；字段类型如果还是另一条消息，可以继续点开查看。需要精确接入时，点“查看源文件”回到能力约定和接口文件原文。
+
+![能力约定的字段、传输方式和接口定义](/img/hub/hub-capability-detail.png)
+
 </details>
+
+## 需要程序读取时使用 API
+
+Hub Cloud 提供只读 REST API，地址前缀是 `https://hub.robonix.ai/api/v1`。软件包目录、软件包详情、统计数据和能力约定可以直接读取；账户信息、收藏和机器人信息需要个人访问令牌。
+
+令牌在 Hub 个人主页的“API”区域生成，只显示一次，有效期 90 天，也可以随时吊销。请求时使用 `Authorization: Bearer <token>`；不要把令牌写进公开仓库或分享链接。
 
 登录后可“收藏”，在 Console 和 [Hub 个人主页](https://hub.robonix.ai/profile)继续查看。添加功能时，在 Console 中点“添加到这台机器人”，再[检查参数并保存](configure.md)。
 

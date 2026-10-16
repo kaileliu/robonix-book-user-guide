@@ -11,7 +11,7 @@ last_update:
 
 先查看 [Hub 中的 TIAGo 配置](https://hub.robonix.ai/package/robonix.robot.pal_robotics.tiago_webots)及其 README。[原 Webots 教程](quickstart.md)记录的完整验收路径使用 Ubuntu 22.04 或 Debian 13、`x86_64`、NVIDIA 图形环境和 Docker；按[主机检查](quickstart.md#1-检查主机)准备工具与设备权限。
 
-这些条件属于原书的测试基线，目录整机版本需另按 README 核对。还需准备模型服务的地址、密钥和模型名；相机任务需要模型支持图像。首次构建会下载源码、镜像和仿真资源。
+目录整机版本可能有不同要求，仍需按 README 核对。还需准备模型服务的地址、密钥和模型名；相机任务需要模型支持图像。首次构建会下载源码、镜像和仿真资源。
 
 ## 安装配置并构建
 

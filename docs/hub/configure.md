@@ -12,14 +12,20 @@ last_update:
 | 分组 | 配置什么 |
 |---|---|
 | 系统服务 | Robonix 的系统组件；Atlas、Executor、Soma 为必需项，不能关闭 |
+| 自带服务 | Robonix 源码中自带的语音、记忆、验证等服务 |
 | [原语包](https://hub.robonix.ai/discover/primitive) | 相机、底盘、雷达等硬件能力 |
 | [服务包](https://hub.robonix.ai/discover/service) | 建图、导航、语音等功能 |
 | [技能包](https://hub.robonix.ai/discover/skill) | 组合能力完成任务 |
 | 环境变量 | 仅对当前部署生效的设置 |
+| 发布信息 | 发布部署时显示的说明 |
 
 ![Console 配置页中的分组、参数和开关](/img/hub/console-configuration.png)
 
-*当前在线演示的“配置”页：按分组检查软件包和参数。*
+*在“配置”页按分组检查软件包和参数。*
+
+![配置页显示系统服务和软件包开关](/img/hub/console-deployment.png)
+
+*系统服务、软件包、环境变量和发布信息分别位于对应分组。*
 
 条目开关控制启动时是否启用。首次使用保留整机配置的组合；关闭某项前，先检查其他功能是否依赖它。
 
@@ -57,6 +63,10 @@ last_update:
 
 </details>
 
+![配置缺少必填环境变量时的提示](/img/hub/console-missing-variable.png)
+
+*缺少变量时，配置页和概览页会给出提示，并提供设置入口。*
+
 ## 添加软件包
 
 1. 在相应分组点“添加软件包”，按名称搜索。
@@ -75,6 +85,8 @@ last_update:
 选择“本机目录”后，对话框列出部署目录内含 `package_manifest.yaml` 的子目录，选中即可添加。需要直接改清单时，点“编辑 YAML”；修改后可“返回表单”。字段见[部署清单说明](../architecture/deployment-and-startup.md)。
 
 没有整机配置时，可以[新建空白部署](deployments.md#新建空白部署)，逐项添加，再保存第一个版本。
+
+直接编辑清单时，页面会保留 YAML 注释并提供语法高亮和错误提示；完成后点“返回表单”回到分组视图。整机配置的完整字段和运行关系见[部署与启动](../architecture/deployment-and-startup.md)。
 
 </details>
 

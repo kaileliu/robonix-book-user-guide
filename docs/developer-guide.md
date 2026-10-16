@@ -31,7 +31,7 @@ last_update:
 - [打包规范](integration-guide/packaging-spec.md)、[构建与代码生成](integration-guide/build-and-codegen.md)：构建、配置与兼容约束。
 - [发布到目录](integration-guide/package-catalog.md)与[结果验证](integration-guide/result-verification.md)：交付给其他人使用前的准备。
 
-开发示例使用[固定的源码版本](README.md#界面名称与版本)。
+开发示例使用本仓库根目录 `ROBONIX_SOURCE_REVISION` 所记录的 Robonix 源码版本；需要复现实例时，先按该版本准备源码。
 
 ## 旧版章节入口
 
