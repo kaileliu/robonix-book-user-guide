@@ -25,7 +25,7 @@ Robonix 覆盖从仿真到实体机器人的完整过程：可以先在 Webots�
 项目定位、应用场景和系统架构见 [Robonix 官网](https://robonix.ai/)，源码、快速上手和设计说明见 [Robonix GitHub 仓库](https://github.com/syswonder/robonix)。
 
 <figure className="home-architecture-figure">
-  <img src="/architecture/robonix-arch.png" alt="Robonix 从用户任务到机器人硬件的系统架构图" />
+  <img src="architecture/robonix-arch.png" alt="Robonix 从用户任务到机器人硬件的系统架构图" />
   <figcaption>先只看这条主线：用户提出任务，Robonix 理解并规划，执行器调用服务和硬件能力，机器人返回状态与结果。图中的系统组件会在“原理与参考”中逐一介绍。</figcaption>
 </figure>
 
@@ -89,12 +89,12 @@ flowchart TD
 
 <div className="home-route-grid">
   <a className="home-route-card" href="getting-started/simulation">
-    <img src="/img/webots/office.jpg" alt="Webots 办公室仿真场景" />
+    <img src="img/webots/office.jpg" alt="Webots 办公室仿真场景" />
     <span className="home-route-card__title">没有实体机器人</span>
     <span className="home-route-card__text">先运行 TIAGo 仿真，再在仿真中完成任务、开发功能或接入新的仿真本体。</span>
   </a>
   <a className="home-route-card" href="integration-guide">
-    <img src="/img/hub/robot-catalog.png" alt="Hub 机器人目录中的型号搜索" />
+    <img src="img/hub/robot-catalog.png" alt="Hub 机器人目录中的型号搜索" />
     <span className="home-route-card__title">已有实体机器人</span>
     <span className="home-route-card__text">先在 Hub 查型号和依赖；有可用配置就安装连接，没有就进入开发适配。</span>
   </a>
