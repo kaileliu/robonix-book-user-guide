@@ -246,6 +246,16 @@ pre {
   line-height: 1.55;
 }
 
+.simulation-demo {
+  display: block;
+  width: 100%;
+  max-width: 960px;
+  margin: 1rem 0;
+  background: #111318;
+  border: 1px solid color-mix(in srgb, var(--ifm-font-color-base) 18%, transparent);
+  border-radius: 0.4rem;
+}
+
 .procedure-meta {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));

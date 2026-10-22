@@ -8,6 +8,8 @@ last_update:
   date: 2026-10-15
 ---
 
+import useBaseUrl from '@docusaurus/useBaseUrl';
+
 # 认识 Robonix
 
 <span id="开始使用-robonix"></span>
@@ -68,6 +70,16 @@ flowchart TD
 ### 没有实体机器人：从仿真开始
 
 先跟随[运行 TIAGo 仿真](getting-started/simulation.md)，在电脑中启动一台虚拟机器人，连接 Client，完成一次相机任务。仿真不需要实体机器人，适合第一次了解 Robonix、验证配置和开发功能。
+
+#### 实操演示
+
+下面的录屏展示了在电脑上确认许可并启动 Robonix 环境的实际过程。可直接在视频中查看完整操作节奏，再结合仿真教程逐步完成自己的首次运行。
+
+<video className="simulation-demo" controls preload="metadata">
+  <source src={useBaseUrl('/video/simulation-start-demo.mp4')} type="video/mp4" />
+</video>
+
+视频中的命令和界面以录制时的版本为准；实际操作请优先遵循上方教程中的当前步骤。
 
 跑通后，可以沿[软件包开发指南](developer-guide.md)添加原语、服务或技能，在仿真中验证自己的功能。要接入厂商提供的仿真本体，进入 [MuJoCo 仿真本体接入](integration-guide/mujoco-simulation-onboarding.md)。
 
