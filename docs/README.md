@@ -9,6 +9,7 @@ last_update:
 ---
 
 import useBaseUrl from '@docusaurus/useBaseUrl';
+import Mermaid from '@theme/Mermaid';
 
 # 认识 Robonix
 
@@ -49,14 +50,17 @@ flowchart LR
 
 从用户最容易理解的硬件角色看，可以把 Robonix 连接的设备分为“感知—认知—执行”三个部分：
 
-```mermaid
-flowchart TD
+<div className="homepage-hardware-flow">
+
+<Mermaid value={`flowchart TD
     P["感知 · 外设<br/>相机、雷达、麦克风、扬声器"]
     C["认知 · 计算设备<br/>PC、服务器、Jetson Orin<br/>部署 Robonix"]
     E["执行 · 机器人本体<br/>小车、机器狗、人形机器人"]
     P <-->|观测与交互| C
     C <-->|动作与反馈| E
-```
+`} />
+
+</div>
 
 - **感知：相机、雷达、麦克风等外设。** 相机提供画面，雷达测量周围空间，麦克风接收声音；扬声器负责把机器人的反馈传达给人。这些设备是机器人观察环境和与人交互的入口。
 - **认知：运行 Robonix 的计算设备。** PC、服务器、Jetson Orin 等设备承载 Robonix，负责理解任务、发现能力、结合环境和本体状态安排执行步骤。计算设备可以装在机器人上，也可以通过网络与机器人连接。
@@ -73,13 +77,11 @@ flowchart TD
 
 #### 实操演示
 
-下面的录屏展示了在电脑上确认许可并启动 Robonix 环境的实际过程。可直接在视频中查看完整操作节奏，再结合仿真教程逐步完成自己的首次运行。
+本视频以 Ranger MuJoCo 机器人仿真本体包为例，演示 Robonix Console 下载、安装、部署本体包、启动 Robonix 的完整流程。可以参照教程和视频来学习。
 
 <video className="simulation-demo" controls preload="metadata">
   <source src={useBaseUrl('/video/simulation-start-demo.mp4')} type="video/mp4" />
 </video>
-
-视频中的命令和界面以录制时的版本为准；实际操作请优先遵循上方教程中的当前步骤。
 
 跑通后，可以沿[软件包开发指南](developer-guide.md)添加原语、服务或技能，在仿真中验证自己的功能。要接入厂商提供的仿真本体，进入 [MuJoCo 仿真本体接入](integration-guide/mujoco-simulation-onboarding.md)。
 

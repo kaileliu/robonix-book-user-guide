@@ -256,6 +256,16 @@ pre {
   border-radius: 0.4rem;
 }
 
+.homepage-hardware-flow .docusaurus-mermaid-container {
+  display: flex;
+  justify-content: center;
+  overflow-x: auto;
+}
+
+.homepage-hardware-flow .docusaurus-mermaid-container svg {
+  flex: 0 0 auto;
+}
+
 .procedure-meta {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
