@@ -13,9 +13,6 @@ This repository uses Chinese for the user-facing book. Keep identifiers, command
 
 ## Use verified technical language
 
-- For the user handbook, preserve the behavior and limits documented in the local Robonix Hub beta.22 PDF first, then the original book. Record source sections and corrections in `maintainer-notes/factual-audit.md`.
-- Use current Hub pages to verify destinations and visible labels. Identify later-version additions explicitly; do not silently mix them into the PDF workflow or infer working tasks from a package name.
-- Preserve prerequisites, destructive effects, failure behavior, and version scope when shortening text. A source conflict must be recorded and resolved explicitly, not smoothed over.
 - Verify commands with the target commit's CLI help or actual execution.
 - Verify configuration fields against the parser, `config.spec`, manifest schema, or standard contract.
 - Use the same term for the same concept throughout the book. In Chinese prose, use the Chinese term first and add the canonical English name in parentheses on first use, for example 原语（Primitive）、服务（Service）、技能（Skill）、能力约定（Contract）、软件包（Package）和机器人部署仓库（Robot Deployment）。
@@ -33,7 +30,6 @@ This repository uses Chinese for the user-facing book. Keep identifiers, command
 ## Structure pages
 
 - Use one `#` title, then a logical `##` and `###` hierarchy without skipped levels.
-- Give each page one purpose. Tutorial sections should follow prerequisites, actions, observable results, and the next step; optional tasks and reference material must have their own place.
 - Use sentence-style Chinese headings that describe the reader's task; do not number headings manually.
 - Put procedures in operation guides, rationale in concept pages, and exact fields or types in reference pages.
 - Link to the authoritative definition instead of copying a long block that can drift.

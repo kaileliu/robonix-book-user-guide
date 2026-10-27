@@ -1,13 +1,14 @@
 import type {Config} from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
-import {existsSync} from 'node:fs';
+import {existsSync, readFileSync} from 'node:fs';
 import {robonixDark, robonixLight} from './src/prism-robonix';
 
+const sourceRevision = readFileSync('ROBONIX_SOURCE_REVISION', 'utf8').trim();
 const hasGitMetadata = existsSync('.git');
 
 const config: Config = {
-  title: 'Robonix 手册',
-  tagline: '从第一次体验到机器人日常使用与开发适配',
+  title: 'Robonix 开发手册',
+  tagline: '具身智能操作系统的使用、开发与本体接入文档',
   favicon: 'img/robonix-mark.svg',
   clientModules: [require.resolve('./src/prism-rosidl.ts')],
   url: 'https://book.robonix.ai',
@@ -65,8 +66,15 @@ const config: Config = {
       config: {margin: 24, scrollOffset: 0},
     },
     announcementBar: {
-      id: 'start-with-robonix',
-      content: '<span class="source-baseline"><a href="https://hub.robonix.ai/discover">Hub 选配置</a> · <a href="/hub">Console 启动机器人</a> · <a href="/getting-started/first-task">Client 下达任务</a></span>',
+      id: `source-baseline-${sourceRevision.slice(0, 8)}`,
+      content:
+        '<span class="source-baseline">对应源码：' +
+        '<a href="https://github.com/syswonder/robonix/tree/dev">Robonix <strong>dev</strong></a>' +
+        ' · <a href="https://github.com/syswonder/robonix/commit/' +
+        sourceRevision +
+        '"><code>' +
+        sourceRevision.slice(0, 8) +
+        '</code></a></span>',
       backgroundColor: '#eef1ff',
       textColor: '#283689',
       isCloseable: false,
@@ -90,8 +98,8 @@ const config: Config = {
           label: '手册',
         },
         {
-          href: 'https://hub.robonix.ai/discover',
-          label: 'Hub 软件包目录',
+          href: 'https://packages.robonix.ai/',
+          label: '软件包目录',
           position: 'right',
         },
         {
@@ -112,17 +120,17 @@ const config: Config = {
         {
           title: '快速入口',
           items: [
-            {label: '运行 TIAGo 仿真', to: '/getting-started/simulation'},
-            {label: '使用我的机器人', to: '/integration-guide'},
-            {label: '问题排查', to: '/troubleshooting'},
-            {label: '开发与进阶适配', to: '/development'},
+            {label: 'Hub 与 Console 使用指南', to: '/getting-started/hub-console'},
+            {label: 'Webots 快速上手', to: '/getting-started/quickstart'},
+            {label: '开发者指南', to: '/developer-guide'},
+            {label: '机器人本体接入', to: '/integration-guide/vendor-onboarding'},
           ],
         },
         {
           title: '社区',
           items: [
             {label: 'GitHub', href: 'https://github.com/syswonder/robonix'},
-            {label: 'Hub 软件包目录', href: 'https://hub.robonix.ai/discover'},
+            {label: '软件包目录', href: 'https://packages.robonix.ai/'},
             {label: '文档贡献', to: '/contributing/documentation'},
           ],
         },

@@ -1,8 +1,3 @@
----
-last_update:
-  date: 2026-10-14
----
-
 # 运行时通信
 
 Robonix 用<strong>能力约定</strong>（Contract）描述稳定的接口语义。实际的<strong>传输方式</strong>（Transport）由每个能力提供方（Provider）自行选择。这两层不能混为一谈。能力约定中的 `rpc`、`topic_in` 和 `topic_out` 说明的是调用形态。运行时通信实现是 ROS 2、gRPC 和模型上下文协议（Model Context Protocol，MCP）。
@@ -130,7 +125,7 @@ rbnx channels
 rbnx inspect
 ```
 
-`rbnx caps -v` 用于核对提供方、能力约定和传输；`rbnx channels` 用于检查已经建立的消费关系；`rbnx inspect` 提供 Atlas 的整体诊断快照。标准接口和当前参考实现见[接口目录](../interface-catalog/index.md)，Python 调用方法见[开发者指南](../development/python-api.md)。
+`rbnx caps -v` 用于核对提供方、能力约定和传输；`rbnx channels` 用于检查已经建立的消费关系；`rbnx inspect` 提供 Atlas 的整体诊断快照。标准接口和当前参考实现见[接口目录](../interface-catalog/index.md)，Python 调用方法见[开发者指南](../developer-guide.md#14-python-接口)。
 
 
 ## 参考

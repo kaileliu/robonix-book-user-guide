@@ -1,7 +1,5 @@
 ---
 title: 执行器
-last_update:
-  date: 2026-10-14
 ---
 <span id="executor-robonixsystemexecutor"></span>
 # 执行器（Executor）
@@ -38,7 +36,7 @@ Executor 用一组同属一个提供方的 MCP 能力约定管理导航、抓取
 
 主调用成功后，Executor 从响应中读取可选的 `run_id`，每 2 秒轮询一次 `/status`。状态响应必须包含 `state`，其值可以是 `PENDING`、`RUNNING`、`PAUSED`、`SUCCEEDED`、`FAILED`、`CANCELED`、`CANCELLED` 或 `TIMEOUT`，并可通过 `detail` 补充说明。`SUCCEEDED`、`FAILED`、`CANCELED` / `CANCELLED` 和 `TIMEOUT` 是终态。
 
-方案取消时，Executor 会对仍在运行的异步调用请求 `<id>/cancel`。稳定、非空的 `run_id` 是并发运行的必要条件；为兼容旧提供方，空 `run_id` 会使状态与取消请求使用 `{}`，此时提供方必须把空请求解释为当前或最近一次运行。普通 RTDL 只需要调用主能力，不应手工插入轮询或取消节点。提供方的完整实现要求和示例见[Python 接口中的 MCP 与 gRPC](../../development/python-api.md#mcp-与-grpc)。
+方案取消时，Executor 会对仍在运行的异步调用请求 `<id>/cancel`。稳定、非空的 `run_id` 是并发运行的必要条件；为兼容旧提供方，空 `run_id` 会使状态与取消请求使用 `{}`，此时提供方必须把空请求解释为当前或最近一次运行。普通 RTDL 只需要调用主能力，不应手工插入轮询或取消节点。提供方的完整实现要求和示例见[开发者指南 14.5](../../developer-guide.md#145-mcp-与-grpc)。
 
 ## 能力结果验证
 

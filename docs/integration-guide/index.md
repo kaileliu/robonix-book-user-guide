@@ -1,51 +1,76 @@
----
-title: 安装并连接机器人
-last_update:
-  date: 2026-10-15
----
+# 接入路线
 
-# 安装并连接机器人
+本章面向要把一台新机器人、一项硬件能力或一个可复用功能接入 Robonix 的开发者。先确定你交付的对象，再进入对应流程。
 
-<span id="接入路线"></span>
+<div class="task-grid">
+  <a class="task-card" href="/integration-guide/vendor-onboarding">
+    <span class="task-card__eyebrow">机器人部署</span>
+    <span class="task-card__title">接入一台完整机器人</span>
+    <span class="task-card__description">组织完整的机器人描述文件（URDF）、Soma 本体树、本体原语、系统配置和本地建图与导航参数。</span>
+  </a>
+  <a class="task-card" href="/integration-guide/mujoco-simulation-onboarding">
+    <span class="task-card__eyebrow">MuJoCo 仿真</span>
+    <span class="task-card__title">接入厂家提供的仿真本体</span>
+    <span class="task-card__description">复用厂家 MuJoCo 工程，或基于 URDF/Xacro 与 ROS 2 驱动建立仿真本体包。</span>
+  </a>
+  <a class="task-card" href="/developer-guide">
+    <span class="task-card__eyebrow">软件包</span>
+    <span class="task-card__title">开发原语、服务或技能</span>
+    <span class="task-card__description">从已验证的 template-rbnx 可运行软件包开始，实现标准能力约定或定义新的技能能力约定。</span>
+  </a>
+  <a class="task-card" href="/integration-guide/packaging-spec">
+    <span class="task-card__eyebrow">部署</span>
+    <span class="task-card__title">编写部署清单</span>
+    <span class="task-card__description">声明系统组件、软件包来源、目标清单、实例名和运行配置。</span>
+  </a>
+  <a class="task-card" href="/integration-guide/result-verification">
+    <span class="task-card__eyebrow">执行结果</span>
+    <span class="task-card__title">使用和开发结果验证</span>
+    <span class="task-card__description">配置 Executor 结果验证框架，使用现有 verifier，或按公共接口开发自定义 verifier。</span>
+  </a>
+  <a class="task-card" href="/integration-guide/package-catalog">
+    <span class="task-card__eyebrow">发布与分发</span>
+    <span class="task-card__title">发布到社区软件包目录</span>
+    <span class="task-card__description">完成仓库元数据、许可证、配置说明、自动校验和目录收录。</span>
+  </a>
+</div>
 
-先从 [Hub 目录](https://hub.robonix.ai/discover)找到自己的型号，再在机器人上安装配置、启动，用 Client 下达任务。
+## 何时可以声明本体已支持
 
-## 开始前确认型号与环境
+创建仓库、构建单个软件包和进入 Robonix 软件包目录（Package Catalog）都只是接入过程中的检查点。只有完整机器人部署在目标本体上完成构建、启动、标准接口与安全验收后，才能在支持列表中标记为“已支持”。
 
-打开 [Hub 机器人目录](https://hub.robonix.ai/discover/robot)，浏览或[搜索型号](https://hub.robonix.ai/discover?kind=robot)。查看条目说明和仓库 README，确认型号、传感器、运行环境与你的设备一致。
+| 检查点 | 说明 | 最低证据 |
+|---|---|---|
+| 仓库已创建 | 代码有可维护的上游位置 | README、LICENSE、维护者 |
+| 软件包可构建 | `package_manifest.yaml` 可解析，目标平台构建成功 | 软件包持续集成检查、构建日志 |
+| 目录已索引 | 软件包目录能读取仓库元数据和清单 | 目录拉取请求与校验结果 |
+| 机器人已验证 | 完整机器人部署在指定本体上完成构建、启动、接口和安全验证 | 本体型号、源码提交号、目标清单、启动日志、验收记录 |
 
-没有真机？可直接[运行 TIAGo 仿真](../getting-started/simulation.md)。
+前三项用于确认代码可维护、软件包可构建且元数据可被社区工具读取，不能替代整机验收；支持列表只采用最后一项的结果。
 
-## 按顺序完成安装与连接
+## 完整机器人接入的交付物
 
-1. [安装 Console](../hub/install.md)：在机器人主机执行安装命令，打开页面并登录。
-2. [安装整机配置](../hub/catalog.md)：在 Console“目录”选择同一型号，确认后安装。
-3. [检查参数](../hub/configure.md)：补齐设备地址和模型服务，保存为新版本。
-4. [构建并启动](../hub/run.md)：完成型号 README 的准备，构建软件包，在“概览”启动。
-5. [安装并连接 Client](../getting-started/client.md)：在操作者电脑打开客户端，确认在线。
-6. [完成第一条任务](../getting-started/first-task.md)：先询问能力；有相机和图像理解能力时，再试一次观察任务。
+一个机器人部署仓库（Robot Deployment）至少包含：
 
-完成连接后，继续[机器人任务](../tasks/index.md)或[日常管理](../hub/index.md)。需要更多功能，可在 [Hub 的服务包](https://hub.robonix.ai/discover/service)和[技能包](https://hub.robonix.ai/discover/skill)中查找，按[添加能力](../hub/configure.md#添加软件包)安装。
+```text
+robot-<vendor>-<model>/
+├── robonix_manifest.yaml       # 整机启动入口
+├── soma.yaml                   # 本体部件树、尺寸、能力归属
+├── urdf/                       # 唯一、完整的机器人 URDF 及其资源
+├── config/                     # 本体专属建图、导航等参数
+├── .env.example                # 只列变量名和非敏感默认值
+└── README.md                   # 支持矩阵、安装、构建、启动和验收
+```
 
-## 没有匹配型号
+原语、服务和技能可以位于独立仓库，通过机器人部署清单的 `url` 和 `branch` 引用；本体专属参数留在部署仓库的 `config/` 下。软件包接受哪些 `config` 字段，以该软件包根目录的 `config.spec` 和源代码验证为准。
 
-维护者给了仓库时，先按 README 准备，再[登记已有目录](../hub/deployments.md#登记已有目录)；给了分享链接时，可以[导入分享](../hub/cloud.md#导入分享链接)。
+## 推荐完成顺序
 
-已有本机软件包但没有整机清单时，可[从空白部署开始配置](../hub/deployments.md#新建空白部署)。硬件驱动尚未适配时，再进入[开发与适配](../development/index.md)。
+1. 用 [template-rbnx](https://github.com/syswonder/template-rbnx/tree/60dc85834c2714022b1821e6fce6c629c0314699) 在目标计算平台跑通一个无真实硬件的最小部署。
+2. 建立完整 URDF 与 Soma 描述，先让系统能准确识别本体结构和能力提供方。
+3. 逐个接入原语，并分别验证数据、坐标系、生命周期和停止行为。
+4. 把本体专属建图与导航参数放入部署仓库的 `config/`，再接入对应服务。
+5. 依次完成仿真、架空/台架、低速空场和真实场景验证。
+6. 记录被验证的源码修订号、目标清单与验收结果，再提交软件包目录。
 
-<details>
-<summary>开发者的适配与验证要求</summary>
-
-<span id="何时可以声明本体已支持"></span>
-
-目录收录不代表整机已验证，查看[支持判定要求](../development/robot-support.md#何时可以声明本体已支持)。
-
-<span id="完整机器人接入的交付物"></span>
-
-新本体需要哪些文件与说明，查看[适配交付物](../development/robot-support.md#完整机器人接入的交付物)。
-
-<span id="推荐完成顺序"></span>
-
-编写驱动与适配的顺序，查看[机器人适配路线](../development/robot-support.md#推荐完成顺序)。
-
-</details>
+继续阅读[本体接入指南](vendor-onboarding.md)，其中每一步都给出工作目录、输入文件、验证命令和预期结果。

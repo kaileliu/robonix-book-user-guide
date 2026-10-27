@@ -1,11 +1,4 @@
----
-last_update:
-  date: 2026-10-14
----
-
 # 机器人本体接入指南
-
-本页面向为新型号编写适配代码、组织整机部署并完成验收的开发者。已有匹配整机配置、只需安装使用的读者，请从[使用我的机器人](index.md)开始。
 
 
 本章面向负责一台真实机器人或仿真本体的集成工程师。完成后会得到一个可独立克隆、构建和启动的**机器人部署仓库（Robot Deployment）**。仓库内包含整机描述、硬件实例、机器人专属配置，以及对社区软件包的引用。
@@ -14,7 +7,7 @@ last_update:
 
 <div class="procedure-meta">
   <div><strong>源码仓库</strong><code>syswonder/robonix</code></div>
-  <div><strong>参考部署</strong><a href="https://hub.robonix.ai/package/robonix.robot.agilex.ranger_mini_v3">AgileX Ranger Mini v3</a></div>
+  <div><strong>参考部署</strong><a href="https://packages.robonix.ai/robots/robonix.robot.agilex.ranger_mini_v3/">AgileX Ranger Mini v3</a></div>
   <div><strong>交付目标</strong>从空目录到可验收部署</div>
 </div>
 
@@ -40,7 +33,7 @@ robot-<vendor>-<model>/
 
 `assets/robot.jpg` 只供 Robonix 软件包目录的机器人列表展示，不参与构建、启动或模型推理。准备把机器人仓库提交到目录时再添加并压缩该图片；不发布目录条目时可以省略。
 
-硬件驱动通常放在独立原语仓库中，由 `robonix_manifest.yaml` 的 `url` 引用；只有暂不复用的部署私有代码才放在本体仓库。先在目录里看 [AgileX Ranger Mini v3 本体页面](https://hub.robonix.ai/package/robonix.robot.agilex.ranger_mini_v3)，了解已发布的硬件组成和软件包。再进入 [`robot-agilex-ranger_mini_v3`](https://github.com/syswonder/robot-agilex-ranger_mini_v3) 查看实际部署清单、配置和包装脚本。学习单个软件包结构时使用 [`template-rbnx`](https://github.com/syswonder/template-rbnx/tree/60dc85834c2714022b1821e6fce6c629c0314699)。采用任何参考部署前，都要核对其整机 URDF 是否包含当前机器人实际安装的全部部件；缺少的坐标关系必须先补齐，不能依赖另一份分离 URDF。
+硬件驱动通常放在独立原语仓库中，由 `robonix_manifest.yaml` 的 `url` 引用；只有暂不复用的部署私有代码才放在本体仓库。先在目录里看 [AgileX Ranger Mini v3 本体页面](https://packages.robonix.ai/robots/robonix.robot.agilex.ranger_mini_v3/)，了解已发布的硬件组成和软件包。再进入 [`robot-agilex-ranger_mini_v3`](https://github.com/syswonder/robot-agilex-ranger_mini_v3) 查看实际部署清单、配置和包装脚本。学习单个软件包结构时使用 [`template-rbnx`](https://github.com/syswonder/template-rbnx/tree/60dc85834c2714022b1821e6fce6c629c0314699)。采用任何参考部署前，都要核对其整机 URDF 是否包含当前机器人实际安装的全部部件；缺少的坐标关系必须先补齐，不能依赖另一份分离 URDF。
 
 构建或启动前的准备步骤统一收敛到部署仓库的 `build.sh` 和 `start.sh`，包括部署目录、环境变量、设备权限、CAN 与串口、RMW router 和容器参数。这样使用者只需要执行固定入口，脚本内部再调用 `rbnx build` 或 `rbnx boot`。
 
@@ -446,7 +439,7 @@ provider = Primitive(
 
 `rbnx boot` 会把部署条目的 `name` 写入 `RBNX_INSTANCE_NAME`，因此后文的 `base_chassis` 会注册成同名提供方。开始实现后再添加 `config.spec`；只有提供方需要向 Pilot 说明调用顺序、约束或长任务语义时才添加可选的 `CAPABILITY.md`。`capabilities/` 用于放置尚未进入 Robonix 标准接口的软件包内能力约定；如果实现的都是标准接口，可以保持为空。
 
-上面的片段只解决运行实例命名。完成原语时，还必须为清单中的 `move`、`twist_in` 和 `odom` 分别实现 gRPC 或 ROS 2 端点；清单本身不会自动注册这些能力。实现方式见[开发原语](../development/implement-primitive.md)。
+上面的片段只解决运行实例命名。完成原语时，还必须为清单中的 `move`、`twist_in` 和 `odom` 分别实现 gRPC 或 ROS 2 端点；清单本身不会自动注册这些能力。实现方式见[开发原语](../developer-guide.md#9-开发原语)。
 
 `package_manifest.yaml` 中的发布元数据、构建入口、启动入口、可选的停止清理入口和标准能力必须与实现一致：
 

@@ -1,6 +1,28 @@
 # Robonix Book
 
-Robonix Book is the Chinese user and developer handbook for Robonix. It covers simulation, Robonix Hub and Console, robot operation, common tasks, troubleshooting, and advanced integration. The site is built with Docusaurus. Source-level reference pages are aligned with pinned `dev` revision [`223675d9a5000e70debae4f2512404cec5c9c442`](https://github.com/syswonder/robonix/tree/223675d9a5000e70debae4f2512404cec5c9c442). The archived mdBook source and tooling remain under `archive/mdbook/` for history and URL migration checks; contributors should edit the Markdown files under `docs/`.
+Robonix Book is the Chinese documentation site for Robonix. The current handbook is built with Docusaurus and aligned with pinned `dev` revision [`c363f077de1fdc82e11ce27ff87e1b038d0ad88d`](https://github.com/syswonder/robonix/tree/c363f077de1fdc82e11ce27ff87e1b038d0ad88d). The archived mdBook source and tooling remain under `archive/mdbook/` for history and URL migration checks; contributors should edit the Markdown files under `docs/`.
+
+## Hub and Console guide
+
+The user-facing workflow is maintained as **one page**:
+[`docs/getting-started/hub-console.md`](docs/getting-started/hub-console.md).
+It is an entry in the existing handbook's **入门** sidebar, with one link from
+the homepage. The existing developer, component, interface and Client pages
+remain the technical references. This is not a separate user handbook.
+
+The earlier multi-page user handbook is preserved in `archive/user-guide/` for
+source comparison and is excluded from the published documentation and search.
+Screenshots used by the guide are in `static/img/hub/`.
+
+The personal Pages configuration remains available for reviewing the integrated
+book. It does not change the upstream site's configuration. Check it locally:
+
+```bash
+GITHUB_REPOSITORY=kaileliu/robonix-book-user-guide npm run build:pages
+python3 scripts/check-built-links.py build-pages --base-url /robonix-book-user-guide/
+```
+
+No upstream pull request is part of this consolidation.
 
 ## Local preview
 
@@ -38,43 +60,6 @@ make full-serve \
   ROBONIX_SOURCE=/absolute/path/to/robonix \
   API_PYTHON=.venv-api/bin/python
 ```
-
-## Personal GitHub Pages site
-
-The `user-guide` branch has a separate Pages workflow for publishing this handbook
-under a personal GitHub account. Enable **Settings → Pages → GitHub Actions** in
-the destination repository, then push that branch. The workflow derives the site
-address from the repository name and publishes it after validation.
-
-To check the same build locally:
-
-```bash
-GITHUB_REPOSITORY=YOUR_USERNAME/robonix-book npm run build:pages
-python3 scripts/check-built-links.py build-pages --base-url /robonix-book/
-```
-
-This build preserves the handbook styling and screenshots. The separately
-generated Rust and Python API links open their pages on `book.robonix.ai`.
-
-## Offline export (double-click to open)
-
-To share the handbook with readers who do not have Node.js or a local web server:
-
-```bash
-npm run export:offline
-```
-
-Send `offline/robonix-book-offline.zip`. Readers should **extract the entire ZIP**
-and double-click `robonix-book/index.html` in Chrome, Edge, Firefox, or Safari.
-Keep the HTML files and asset folders together; sending `index.html` alone will
-not work. A local copy is also available at `offline/robonix-book/index.html`.
-
-The export includes relative file links, the complete sidebar, offline text
-search, images, Mermaid diagrams, platform tabs, and code copying. It uses a
-separate static runtime compatible with `file://`; the ordinary production
-`build/` directory still targets HTTP hosting. Hub, GitHub, and the separately
-generated Rust/Python API reference require internet access;
-API links are marked “在线”. Regenerate the ZIP after changing the handbook.
 
 ## Contributing
 

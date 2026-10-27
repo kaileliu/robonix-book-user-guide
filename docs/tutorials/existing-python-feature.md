@@ -1,8 +1,3 @@
----
-last_update:
-  date: 2026-10-14
----
-
 # 接入现有 Python 功能
 
 本页只讨论一个具体案例。已有一个 Python 程序，能通过厂商 SDK 控制机械臂和末端夹爪抓取积木，现在要把这项功能接入 Robonix。示例假设目标积木已经完成识别和定位，重点说明机械臂、夹爪控制与抓取流程如何接入；如果原程序还直接访问相机或力传感器，也要分别接入对应原语。
@@ -279,7 +274,7 @@ config:
   state_period_sec: 0.02
 ```
 
-该原语使用 ROS 2 传输，因此构建和启动脚本必须生成、编译并加载 Robonix ROS 2 叠加层；可直接采用[开发原语](../development/implement-primitive.md)中的脚本。
+该原语使用 ROS 2 传输，因此构建和启动脚本必须生成、编译并加载 Robonix ROS 2 叠加层；可直接采用[开发原语](../developer-guide.md#9-开发原语)中的脚本。
 
 ## 5. 将抓积木流程接入技能
 
@@ -412,7 +407,7 @@ description: 抓取一个已经识别并定位的积木，并支持状态查询�
 - 取消：技能停止后续动作；机械臂原语负责看门狗、限位和当前硬件运动的安全停止。
 ```
 
-该技能既生成 MCP 请求/响应类型，又使用 ROS 2 的 `JointState`。它的 `scripts/build.sh` 和 `scripts/start.sh` 采用[开发原语](../development/implement-primitive.md)中的叠加层脚本：代码生成参数保持 `--mcp --ros2`，并把启动命令改为 `python3 -m grasp_block.main`。不能只运行 `rbnx codegen` 而不执行 `colcon build`，也不能在启动时省略生成叠加层的 `setup.bash`。
+该技能既生成 MCP 请求/响应类型，又使用 ROS 2 的 `JointState`。它的 `scripts/build.sh` 和 `scripts/start.sh` 采用[开发原语](../developer-guide.md#9-开发原语)中的叠加层脚本：代码生成参数保持 `--mcp --ros2`，并把启动命令改为 `python3 -m grasp_block.main`。不能只运行 `rbnx codegen` 而不执行 `colcon build`，也不能在启动时省略生成叠加层的 `setup.bash`。
 
 业务入口使用 MCP，因为当前 Pilot 和 Executor 通过 MCP 调用模型可见工具。`rpc` 在这里表示请求—响应语义，不表示必须使用 gRPC。`status` 与 `cancel` 可能出现在工具目录中，但应用开发者不应把它们手工写进普通业务计划。Executor 会自动轮询状态，根级方案取消也由 Executor 转发到该抓取任务。
 

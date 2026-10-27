@@ -2,7 +2,7 @@
 
 这份指南面向已经取得厂家模型或驱动资料、准备把 MuJoCo 仿真机器人接入 Robonix 的开发者。接入工作以复用现有模型、控制器和 ROS 接口为主，再补充目标本体包所需的加载、 桥接和 Robonix 能力约定（Capability）配置。本文不讨论从 CAD 开始重建机器人动力学模型。
 
-文中的文件结构参考 Robonix 社区发布的 [`Ranger Mini V3 + Piper`](https://hub.robonix.ai/package/robonix.robot.agilex.ranger_with_piper_mujoco) 本体包。所有相对路径均以该本体包的仓库根目录为基准。
+文中的文件结构参考 Robonix 社区发布的 [`Ranger Mini V3 + Piper`](https://packages.robonix.ai/robots/robonix.robot.agilex.ranger_with_piper_mujoco/) 本体包。所有相对路径均以该本体包的仓库根目录为基准。
 
 完成本文后，机器人应当能够由 `start.sh` 独立启动 Web 或 Native MuJoCo 仿真，由 `rbnx boot` 加载同一套本体包，并通过 Robonix 原语（Primitive）、服务（Service）和技能（Skill）完成移动、感知或操作任务。
 

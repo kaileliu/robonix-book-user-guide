@@ -1,8 +1,3 @@
----
-last_update:
-  date: 2026-10-14
----
-
 # 机械臂
 
 机械臂原语用统一的关节名称和单位提供指令、反馈与末端位姿。夹爪若属于机械臂，也作为同一 `JointState` 中的具名关节暴露。
@@ -50,7 +45,7 @@ last_update:
 - `topic_out` 是提供方持续输出的数据流。代码生成后，调用方以服务端流方式订阅 `end_pose` 或 `joint_states`。
 - `topic_in` 是调用方向提供方持续写入的输入流。代码生成后，调用方以客户端流方式发送 `pos_command` 或 `joint_command`。
 
-具体通信库调用方式见[运行时通信](../../architecture/runtime-communication.md)和[开发者指南中的 gRPC 示例](../../development/python-api.md#mcp-与-grpc)。
+具体通信库调用方式见[运行时通信](../../architecture/runtime-communication.md)和[开发者指南中的 gRPC 示例](../../developer-guide.md#145-mcp-与-grpc)。
 
 ### 消息示例
 

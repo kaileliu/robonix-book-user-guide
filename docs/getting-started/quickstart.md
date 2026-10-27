@@ -1,11 +1,4 @@
----
-last_update:
-  date: 2026-10-14
----
-
 # Webots 快速上手
-
-这是一条面向命令行部署与调试的完整流程。首次体验建议先走 [Console 仿真快速开始](simulation.md)；需要理解构建、容器和启动细节时，再使用本页。
 
 
 本教程在一台 Linux x86_64 主机上启动 Tiago Webots 仿真，以及 Robonix 的系统组件、原语（Primitive）、服务（Service）和技能（Skill），然后通过 Liaison 提交一条自然语言任务。第一次执行会编译 Rust 工作区、构建容器并下载依赖；后续复用缓存时才是快速启动流程。

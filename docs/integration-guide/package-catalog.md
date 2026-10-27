@@ -1,11 +1,4 @@
----
-last_update:
-  date: 2026-10-15
----
-
 # 软件包目录发布流程
-
-本页面向发布软件包和维护目录元数据的开发者。查找并安装已有配置，请看[选择机器人配置](../hub/catalog.md)；仅分享部署清单，请看[备份与分享](../hub/cloud.md)。
 
 ## 向目录提交
 
@@ -151,40 +144,64 @@ service:
 
 ## 网站和接口
 
-用户现在从 [Hub 目录](https://hub.robonix.ai/discover)查找配置和软件包：
+软件包目录主页和页面：
 
-| 要找什么 | Hub 入口 |
-|---|---|
-| 整机配置 | [机器人](https://hub.robonix.ai/discover/robot) |
-| 硬件连接 | [原语包](https://hub.robonix.ai/discover/primitive) |
-| 通用功能 | [服务包](https://hub.robonix.ai/discover/service) |
-| 任务组合 | [技能包](https://hub.robonix.ai/discover/skill) |
+- 主页：[Robonix Package Catalog](https://packages.robonix.ai/)
+- 普通软件包列表：[软件包](https://packages.robonix.ai/packages/)
+- 机器人部署列表：[机器人](https://packages.robonix.ai/robots/)
 
-条目详情使用 `/package/<完整目录名称>`，例如 [mapping](https://hub.robonix.ai/package/robonix.service.mapping)。Hub 用于查看、收藏；在目标机器的 Console 中安装或添加，见[用户操作](../hub/catalog.md)。
+软件包目录 API 是静态 JSON API。全部接口使用 `GET`，不需要 API 密钥。由于目录是静态站，不支持服务端查询参数；搜索以及按标签、类型、能力过滤都在客户端取得 JSON 后完成。
 
-提交合并后，还需等待 Hub 同步目录。以上仓库流程中的静态目录产物与 Hub 的 REST API 是不同接口；接入当前 Hub 时使用下表。
+| 方法 | 路径 | 参数 | 返回 |
+|---|---|---|---|
+| `GET` | `/api/v1/packages` | 无 | 普通原语、服务和技能软件包，返回 `packages[]` |
+| `GET` | `/api/v1/robots` | 无 | 整机部署配置，返回 `robots[]` |
+| `GET` | `/api/v1/catalog` | 无 | 全量目录，返回 `packages[]`，包含普通软件包和机器人部署仓库 |
+| `GET` | `/api/v1/search` | 无 | 全量目录数组，用于客户端搜索和过滤 |
+| `GET` | `/api/v1/package/<name>` | `name` 是经过 URL 编码的完整目录名称 | 单个普通软件包或机器人部署仓库；不存在时返回 `404` |
 
-### Hub 只读 API
+完整 URL 示例：
 
-以下路径与返回字段按 2026-10-14 的官方 OpenAPI 核对，适用于 Hub 的 REST API。
-
-地址前缀为 `https://hub.robonix.ai/api/v1`。公共目录和能力约定无需令牌；账户、收藏和机器人数据需要个人访问令牌。以 [OpenAPI](https://hub.robonix.ai/api/v1/openapi.json) 为准。
-
-| GET 路径 | 用途 |
-|---|---|
-| `/packages` | 列表，返回 `{ total, items }`；支持 `q`、`kind`、`tag`、`provides`、`sort`、`limit`、`offset` |
-| `/packages/{name}` | 条目元数据、版本、README、能力和依赖 |
-| `/packages/{name}/stats` | 条目统计 |
-| `/contracts?id=...&package=...` | 能力约定及接口定义 |
-| `/contracts/type?name=...` | 接口引用的消息类型 |
-
-示例：
-
-```bash
-curl -fsS 'https://hub.robonix.ai/api/v1/packages?kind=robot&q=tiago'
-curl -fsS 'https://hub.robonix.ai/api/v1/packages/robonix.service.mapping'
+```text
+GET https://packages.robonix.ai/api/v1/packages
+GET https://packages.robonix.ai/api/v1/robots
+GET https://packages.robonix.ai/api/v1/catalog
+GET https://packages.robonix.ai/api/v1/package/robonix.service.mapping
+GET https://packages.robonix.ai/api/v1/package/robonix.robot.agilex.ranger_mini_v3
 ```
 
-查询普通包和机器人使用同一个 `/packages` 接口。详情中的 `uses` 可对照整机使用的软件包，`provides` 和 `modes` 可对照能力树；不要把实例名（如 `nav2`）当成目录发布名。
+JavaScript 使用示例：
 
-个人令牌在 [Hub 个人主页](https://hub.robonix.ai/profile)的 API 入口管理，只显示一次，有效期 90 天，请求头为 `Authorization: Bearer TOKEN`。
+```js
+const base = 'https://packages.robonix.ai/api/v1';
+
+const packageCatalog = await fetch(`${base}/packages`).then(r => r.json());
+const mapping = packageCatalog.packages.find(p => p.name === 'robonix.service.mapping');
+
+const robots = await fetch(`${base}/robots`).then(r => r.json());
+const ranger = robots.robots.find(r => r.name === 'robonix.robot.agilex.ranger_mini_v3');
+
+const detail = await fetch(`${base}/package/${encodeURIComponent(ranger.name)}`)
+  .then(r => r.json());
+```
+
+单个目录对象的字段含义：
+
+| 字段 | 类型 | 含义 |
+|---|---|---|
+| `name` | string | 目录发布名，例如 `robonix.service.mapping` 或 `robonix.robot.agilex.ranger_mini_v3` |
+| `version` | string | 版本 |
+| `description` | string | 一句话描述 |
+| `license` | string | SPDX 许可证标识 |
+| `tags` | string[] | 页面和客户端过滤标签 |
+| `maintainers` | string[] | `Name <email@domain>` 格式维护者 |
+| `repo` | string | GitHub 仓库 URL |
+| `repo_name` | string | 仓库名 |
+| `default_branch` | string | 目录索引时读取的默认分支 |
+| `kind` | string | `primitive` / `service` / `skill` / `robot` |
+| `catalog_type` | string | `package` 或 `robot` |
+| `manifest` | string | 索引的源文件，通常是 `package_manifest.yaml` 或 `robonix_manifest.yaml` |
+| `preview_image_url` | string | 软件包目录卡片使用的预览图 URL；机器人仓库通常来自 `assets/robot.jpg`，缺失时为空字符串 |
+| `capabilities` | string[] | 普通软件包声明的 Robonix 能力约定 ID |
+| `deploy_dependencies` | object[] | 机器人部署仓库依赖的原语、服务和技能条目 |
+| `readme_url` | string | 被索引分支上的 README URL |

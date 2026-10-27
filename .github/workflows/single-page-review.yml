@@ -1,0 +1,34 @@
+name: Validate single-page guide
+
+on:
+  push:
+    branches: [hub-console-single-page]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run check:code-blocks && npm run check:assets && npm run typecheck
+      - run: npm run build:pages
+      - name: Check personal preview
+        run: |
+          python3 scripts/check-built-links.py build-pages --base-url /robonix-book-user-guide/
+          python3 scripts/check-legacy-urls.py build-pages
+          test -s build-pages/search-index.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: single-page-book-preview
+          path: build-pages
+          retention-days: 14

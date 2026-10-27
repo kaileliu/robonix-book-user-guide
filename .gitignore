@@ -15,3 +15,6 @@ __pycache__/
 
 # Locally generated API docs (rustdoc/Sphinx). Built fresh by CI for Pages.
 src/api/
+
+# Local dependency directory or symlink.
+/node_modules
