@@ -12,7 +12,7 @@ Robonix 是面向具身智能机器人的操作系统运行时。它把本体驱
 
 ## 从这里开始
 
-通过网页安装和管理机器人时，阅读 [Hub 与 Console 使用指南](getting-started/hub-console.md)：选择仿真或真机路线，完成配置、启动、Client 连接与日常管理。需要固定源码和命令行部署时，使用下面的原有入口。
+通过网页安装和管理机器人时，阅读 [Hub 与 Console 使用指南](getting-started/hub-console.md)：没有实体机器人时跟随 TIAGo 仿真教程，有实体机器人时按适配、安装和运行步骤使用；配置、Client、建图导航与日常管理的完整操作都在同一页。需要固定源码和命令行部署时，使用下面的原有入口。
 
 <div class="task-grid">
   <a class="task-card" href="/getting-started/quickstart">
