@@ -1,6 +1,6 @@
 ---
 title: Hub 与 Console 使用指南
-description: 没有实体机器人时运行 Ranger Mini V3 MuJoCo 仿真，有云深处 Lite3 真机时安装并使用 Robonix；在同一页完成配置、Client 交互和日常管理。
+description: 按是否有实体机器人选择仿真或本体使用路线，以 Ranger 仿真和云深处 Lite3 为例，完成安装、配置、Client 交互和日常管理。
 toc_max_heading_level: 3
 ---
 
@@ -11,13 +11,13 @@ import styles from './hub-console.module.css';
 
 # Hub 与 Console 使用指南
 
-使用 Robonix，可以从仿真开始，也可以直接使用已经适配的实体机器人。先选择下面与你当前条件相符的一条路线，完成一次“安装配置 → 启动 → 连接 → 执行任务”的流程，再按需使用建图、导航、配置备份等功能。
+本页介绍 Robonix 的两条使用路线：**仿真路线**和**本体路线**。没有实体机器人时，从电脑中的仿真环境开始；已有实体机器人时，在完成适配的本体上安装并运行。选择适合自己条件的路线，完成“安装配置 → 启动 → 连接 → 执行任务”，再按需使用建图、导航、配置备份等功能。
 
-**没有实体机器人**：从 [Ranger 仿真路线](#没有实体机器人运行仿真)开始。完成后，MuJoCo 中出现仿真场景，Console 显示运行中，Client 能连接并发送任务。
+**仿真路线**：[没有实体机器人：运行仿真](#没有实体机器人运行仿真)。完成后，仿真环境与 Robonix 正常运行，Client 能连接仿真机器人并发送任务。
 
-**有云深处 Lite3 真机**：从 [Lite3 真机路线](#有实体机器人安装并使用)开始。完成后，底盘和传感器正常启动，Client 能连接 Lite3 并进行文本交互。
+**本体路线**：[有实体机器人：安装并使用](#有实体机器人安装并使用)。完成后，机器人本体和所需组件正常运行，Client 能连接实体机器人并进行交互。
 
-两条路线的区别在于**机器人从哪里来，以及启动前准备什么**：仿真路线在电脑中启动虚拟本体；真机路线先检查型号适配、驱动和设备。两者都通过 Hub 选择整机配置，在 Console 检查和管理配置，再用 Client 下达任务；具体构建与启动方式按各自路线操作。
+下面分别以**松灵 Ranger Mini V3 的 MuJoCo 仿真**和**云深处 Lite3 四足机器人**展示操作。它们是两条路线的示例；使用其他仿真或本体时，按对应整机配置准备环境、驱动和设备。两条路线都通过 Hub 选择配置，在 Console 检查和管理配置，再用 Client 下达任务；具体构建与启动方式以所用整机说明为准。
 
 | 工具 | 用途与位置 |
 |---|---|
@@ -29,15 +29,15 @@ import styles from './hub-console.module.css';
 
 ## 没有实体机器人：运行仿真
 
-这条路线使用**松灵 Ranger Mini V3 移动机器人仿真**，带 Piper 机械臂，在 MuJoCo 中运行。Console、仿真和 Client 可以安装在同一台电脑上。按顺序完成后，你应能看到仿真房间和机器人，通过 Client 连接这套仿真部署并发送文本任务。
+仿真路线通过电脑中的虚拟机器人体验 Robonix。以下以**松灵 Ranger Mini V3 移动机器人仿真**为例：带 Piper 机械臂，在 MuJoCo 中运行。Console、仿真和 Client 可以安装在同一台电脑上。按示例完成后，你应能看到仿真房间和机器人，并通过 Client 连接、发送文本任务。
 
 ### 准备运行仿真的电脑
 
-本节使用 [Ranger Mini V3 MuJoCo 整机配置](https://hub.robonix.ai/package/robonix.robot.agilex.ranger_with_piper_mujoco)的 **native 后端**。软件包 README 的端到端测试环境是 **Ubuntu 22.04、x86_64、ROS 2 Humble 和 Docker**；这不是任意操作系统或硬件的兼容保证。准备以下条件：
+本示例使用 [Ranger Mini V3 MuJoCo 整机配置](https://hub.robonix.ai/package/robonix.robot.agilex.ranger_with_piper_mujoco)的 **native 后端**。软件包 README 的端到端测试环境是 **Ubuntu 22.04、x86_64、ROS 2 Humble 和 Docker**；这不是任意操作系统或硬件的兼容保证。准备以下条件：
 
 - Docker Engine 与 Compose 插件，当前用户能够直接运行 Docker。
 - Node.js 20 或更高版本、npm、Python 3、Git 和 curl。
-- 可用的 X11 / WSLg 桌面会话与硬件 OpenGL；native 窗口及相机渲染需要 GPU 支持，软件渲染不属于这条启动路线。
+- 可用的 X11 / WSLg 桌面会话与硬件 OpenGL；native 窗口及相机渲染需要 GPU 支持，软件渲染不属于本示例的启动方式。
 - 可访问 GitHub、npm 和容器镜像源的网络，构建期间保持连接畅通。
 - 可用的 Hub 账户，以及支持图像理解和工具调用的模型服务地址、密钥、模型名。
 
@@ -55,7 +55,7 @@ docker compose version
 
 各命令应正常退出，Node.js 主版本不低于 20，Compose 为 v2。`docker ps` 报权限错误时，先处理 Docker 的当前用户权限，再继续；不要用 `sudo` 启动整个安装或仿真流程。
 
-[Webots 命令行教程](quickstart.md)介绍另一条仿真路线，其 NVIDIA / Webots 环境要求与本节 MuJoCo 分开。这里继续使用 Ranger 软件包自己的脚本。
+[Webots 命令行教程](quickstart.md)介绍另一种仿真实现，其环境要求和启动脚本与本示例不同。下面使用 Ranger MuJoCo 软件包自己的脚本。
 
 ### 在仿真电脑安装 Console
 
@@ -164,7 +164,7 @@ cd "DEPLOYMENT_DIR"
 bash sim/start.sh --backend native
 ```
 
-本节使用 native 后端，需要可用的 X11 / WSLg 图形会话和硬件 OpenGL。保持终端打开，等待 MuJoCo 窗口显示场景；下面是 `scenesmith_house_187` 场景的启动画面。
+本示例使用 native 后端，需要可用的 X11 / WSLg 图形会话和硬件 OpenGL。保持终端打开，等待 MuJoCo 窗口显示场景；下面是 `scenesmith_house_187` 场景的启动画面。
 
 <figure>
   <img src={useBaseUrl('/img/hub/ranger-native-viewer.png')} alt="MuJoCo native 窗口显示 Ranger 仿真房间中的沙发与茶几" width="1213" height="706" loading="lazy" />
@@ -202,7 +202,7 @@ pip install -e .
 robonix-client --robot-host 127.0.0.1
 ```
 
-`python3` 应指向符合版本要求的解释器。Windows 安装与可选音频依赖按仓库 README 操作；Ranger 当前仿真包未配置音频，本路线先用文本交互。
+`python3` 应指向符合版本要求的解释器。Windows 安装与可选音频依赖按仓库 README 操作；Ranger 当前仿真包未配置音频，本示例先用文本交互。
 
 打开 [http://127.0.0.1:7860](http://127.0.0.1:7860)，将 **Robot Host** 填为 Robonix 所在电脑的地址，同机运行使用 `127.0.0.1`；**Atlas Port** 填 Console 概览显示的端口，**Liaison Endpoint** 通常留空，点 **Connect** 等待在线。然后在 Chat 中输入一条简单文本任务并发送，查看响应。
 
@@ -221,7 +221,7 @@ Client 在另一台电脑时，按 Console 的提示允许其他机器连接，�
 
 ## 有实体机器人：安装并使用
 
-这条路线以**云深处 Lite3 四足机器人**为例，使用 [Lite3 整机配置](https://hub.robonix.ai/package/robonix.robot.deep_robotics.lite3)。Console 和 Robonix 安装在机器人计算主机上，Client 安装在操作者电脑上。完成后，应能连接机器人、查看状态并进行文本交互。
+本体路线在已适配的实体机器人上运行 Robonix。以下以**云深处 Lite3 四足机器人**为例，使用 [Lite3 整机配置](https://hub.robonix.ai/package/robonix.robot.deep_robotics.lite3)。Console 和 Robonix 安装在机器人计算主机上，Client 安装在操作者电脑上。按示例完成后，应能连接机器人、查看状态并进行文本交互。其他本体按各自整机说明核对硬件、依赖和启动方式。
 
 ### 准备 Lite3 与机器人主机
 
@@ -297,7 +297,7 @@ ssh -N -L 4880:127.0.0.1:4880 ROBOT_USER@ROBOT_HOST
 
 ### 准备凭据并构建 Lite3 软件包
 
-Lite3 仓库提供 `build.sh`、`start.sh` 和 `stop.sh`。其中启动脚本还处理 ROS 环境、通信进程和启动前清理，本路线使用这组脚本，不将 Console“启动”按钮视为它的完整替代。
+Lite3 仓库提供 `build.sh`、`start.sh` 和 `stop.sh`。其中启动脚本还处理 ROS 环境、通信进程和启动前清理，本示例使用这组脚本，不将 Console“启动”按钮视为它的完整替代。
 
 将 `DEPLOYMENT_DIR` 替换为上一步记录的 **Lite3 部署目录**，在机器人主机终端进入该目录。首次创建本机配置时执行：
 
@@ -366,7 +366,7 @@ robonix-client --robot-host ROBOT_HOST
 
 ## 运行之后：建图、导航与场景
 
-先确认机器人与 Client 已正常连接，再使用整机已有的功能。Ranger 仿真和本页 Lite3 配置均包含建图、导航与场景相关组件，但启动模式和硬件参数不同。**Console 用于管理部署，地图和场景在各服务自己的界面中操作。**
+先完成所选使用路线，确认机器人与 Client 正常连接，再使用整机已有的功能。本页 Ranger 仿真和 Lite3 本体两个示例均配置了建图、导航与场景相关组件；其他整机需分别核对能力与依赖，启动模式和硬件参数以各自配置为准。**Console 用于管理部署，地图和场景在各服务自己的界面中操作。**
 
 本节按书中的[建图与定位](../components/mapping.md)、[导航](../components/navigation.md)和[场景服务](../components/scene.md)指南整理；内测手册中的配置、运行和日志操作仍适用。
 
@@ -466,7 +466,7 @@ ssh -N -L 50107:127.0.0.1:50107 ROBOT_USER@ROBOT_HOST
   <figcaption>展开条目后编辑参数；长说明可点“更多”查看。</figcaption>
 </figure>
 
-模型地址和密钥等本机共用值放在“设置 → 机器人环境变量”；“配置”中的环境变量只对当前部署生效，同名时以部署为准。Lite3 的命令行脚本另需读取部署目录中的 `.env`，按[真机路线](#准备凭据并构建-lite3-软件包)维护，不把密钥写进清单。
+模型地址和密钥等本机共用值放在“设置 → 机器人环境变量”；“配置”中的环境变量只对当前部署生效，同名时以部署为准。Lite3 的命令行脚本另需读取部署目录中的 `.env`，按[Lite3 示例的凭据设置](#准备凭据并构建-lite3-软件包)维护，不把密钥写进清单。
 
 需要添加功能时，在对应分组点“添加软件包”，先核对 [Hub 目录](https://hub.robonix.ai/discover)中的能力与依赖，再添加、设置参数。已有条目不能重复添加；本机包需在部署目录中有 `package_manifest.yaml`。
 
@@ -479,7 +479,7 @@ ssh -N -L 50107:127.0.0.1:50107 ROBOT_USER@ROBOT_HOST
 
 ### 管理多套部署
 
-“设置”的部署列表显示名称和路径，“概览”上方可切换当前部署。一套部署对应一个目录及其独立历史，可分别保存 Ranger 仿真、Lite3 真机或实验配置。
+“设置”的部署列表显示名称和路径，“概览”上方可切换当前部署。一套部署对应一个目录及其独立历史，可分别保存仿真、本体或实验配置。
 
 | 操作 | 结果与检查 |
 |---|---|
@@ -525,7 +525,7 @@ ssh -N -L 50107:127.0.0.1:50107 ROBOT_USER@ROBOT_HOST
 
 在目标机器安装 Console，登录同一 Hub 账户，点“从云端下载”并选择“机器人・部署”。**默认创建新部署，当前部署保持不变**；只有显式勾选覆盖，才替换当前部署的清单和历史。
 
-下载后核对硬件、设备地址和路径，补齐软件包、本机凭据、地图与资源，再按对应路线构建、启动、验证。不要把 Ranger 仿真副本当成 Lite3 真机配置使用。
+下载后核对硬件、设备地址和路径，补齐软件包、本机凭据、地图与资源，再按对应路线构建、启动、验证。仿真配置不能直接替代实体机器人的适配配置。
 
 #### 分享配置
 
@@ -614,7 +614,7 @@ Lite3 脚本运行先保留终端输出和部署目录 `rbnx-boot/logs/` 中的�
 
 Console 反馈可附系统与硬件、版本、最近日志和管理程序设置；当前部署清单默认不勾选，选中后其中的密钥会替换为占位符。Hub 网页反馈附浏览器信息。通过 Lite3 脚本启动时，检查附件是否包含本次运行日志，缺失时另外整理提供。
 
-一条反馈描述一个问题，注明 Ranger 仿真或 Lite3 真机、软件版本和发生时间。Console 无法连接 Hub 时，可“下载反馈包”交给维护者。需要恢复配置时，先导出历史留底，再对比、回滚并重启；本机资源与代码另行检查。
+一条反馈描述一个问题，注明使用的是仿真还是本体路线、机器人型号、软件版本和发生时间。Console 无法连接 Hub 时，可“下载反馈包”交给维护者。需要恢复配置时，先导出历史留底，再对比、回滚并重启；本机资源与代码另行检查。
 
 ## 查阅常用概念
 
