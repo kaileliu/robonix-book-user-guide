@@ -1,6 +1,6 @@
 ---
 title: Hub 与 Console 使用指南
-description: 没有实体机器人时运行 TIAGo 仿真，有实体机器人时安装并使用 Robonix；在同一页完成配置、Client 交互和日常管理。
+description: 没有实体机器人时运行 Ranger Mini V3 MuJoCo 仿真，有实体机器人时安装并使用 Robonix；在同一页完成配置、Client 交互和日常管理。
 toc_max_heading_level: 3
 ---
 
@@ -14,7 +14,7 @@ import TabItem from '@theme/TabItem';
 
 | 你的条件 | 使用路线 | 完成后应该看到什么 |
 |---|---|---|
-| 没有实体机器人 | [没有实体机器人：运行仿真](#没有实体机器人运行仿真) | TIAGo 出现在 Webots 中，Console 显示运行中，Client 能取得与仿真画面相符的相机结果 |
+| 没有实体机器人 | [没有实体机器人：运行仿真](#没有实体机器人运行仿真) | MuJoCo 中出现 Ranger 与 Piper，Console 显示运行中，Client 能观察相机并提交探索任务 |
 | 有实体机器人 | [有实体机器人：安装并使用](#有实体机器人安装并使用) | 适配的本体和服务正常运行，Client 在线，任务结果与现场一致 |
 
 两条路线的区别在于**机器人从哪里来，以及启动前准备什么**：仿真路线在电脑中启动虚拟本体；真机路线先检查型号适配、驱动和设备。两者都通过 Hub 选择配置、Console 管理运行、Client 下达任务。
@@ -29,108 +29,215 @@ import TabItem from '@theme/TabItem';
 
 ## 没有实体机器人：运行仿真
 
-这条路线在一台电脑上运行 TIAGo Webots，让你不接触真机也能完成首次配置和相机任务。Console、仿真和 Client 可以装在同一台电脑上。依次完成下面各步；构建完成不等于仿真已经启动。
+这条路线使用**松灵 Ranger Mini V3 移动机器人仿真**，带 Piper 机械臂，在 MuJoCo 中运行。Console、仿真和 Client 可以安装在同一台电脑上。按顺序完成后，你应能看到仿真房间和机器人，通过 Client 观察前置相机画面，并提交一次探索任务。
 
-### 准备运行 TIAGo 的电脑
+### 准备运行仿真的电脑
 
-先打开 [TIAGo Webots 整机条目](https://hub.robonix.ai/package/robonix.robot.pal_robotics.tiago_webots)，核对 README 的主机、图形、Docker 和设备权限要求。
+本节使用 [Ranger Mini V3 MuJoCo 整机配置](https://hub.robonix.ai/package/robonix.robot.agilex.ranger_with_piper_mujoco)的默认 **Web 后端**。软件包 README 的端到端测试环境是 **Ubuntu 22.04、x86_64、ROS 2 Humble 和 Docker**；这不是任意操作系统或硬件的兼容保证。准备以下条件：
 
-原 [Webots 命令行教程](quickstart.md)的完整验收环境是 Ubuntu 22.04 或 Debian 13、`x86_64`、NVIDIA 图形环境和 Docker；按其[主机检查](quickstart.md#1-检查主机)准备工具与权限。Hub 中选择的配置可能有不同版本要求，仍以该条目 README 为准。
+- Docker Engine 与 Compose 插件，当前用户能够直接运行 Docker。
+- Node.js 20 或更高版本、npm、Python 3、Git 和 curl。
+- 可用的桌面图形会话与 WebGL 2；首次体验使用带图形加速的桌面，软件渲染可能很慢。
+- 可访问 GitHub、npm、容器镜像源和 Playwright 浏览器下载服务的网络。
+- 可用的 Hub 账户，以及支持图像理解和工具调用的模型服务地址、密钥、模型名。
 
-准备可用 Hub 账户，以及模型服务的地址、密钥、模型名；本路线要让机器人描述相机画面，因此模型必须支持图像理解。首次构建需要下载源码、镜像和仿真资源。
+先在终端检查：
+
+```bash
+git --version
+curl --version
+node --version
+npm --version
+python3 --version
+docker ps
+docker compose version
+```
+
+各命令应正常退出，Node.js 主版本不低于 20，Compose 为 v2。`docker ps` 报权限错误时，先处理 Docker 的当前用户权限，再继续；不要用 `sudo` 启动整个安装或仿真流程。
+
+[Webots 命令行教程](quickstart.md)介绍另一条仿真路线，其 NVIDIA / Webots 环境要求与本节 MuJoCo 分开。这里继续使用 Ranger 软件包自己的脚本。
 
 ### 在仿真电脑安装 Console
 
-在仿真电脑终端，以运行 Robonix 的普通用户执行：
+1. 准备 Hub 账户。收到邀请邮件时，打开激活链接、输入验证码，完成页面要求的协议确认并设置密码；已有账户可直接使用。在浏览器打开 [Hub](https://hub.robonix.ai/discover)，确认能登录。开启两步验证时准备验证码。
+2. 在仿真电脑终端，以平时使用电脑的普通用户执行：
 
-```bash
-curl -fsSL https://hub.robonix.ai/install | bash
-```
+   ```bash
+   curl -fsSL https://hub.robonix.ai/install | bash
+   ```
 
-按提示接受许可协议，填写模型服务设置，等待安装器给出管理页面地址。不要用 root 或在前面加 `sudo`。在同一台电脑打开 [http://127.0.0.1:4880](http://127.0.0.1:4880)，使用 Hub 账户登录。
+   不要使用 root，也不要在命令前加 `sudo`。安装器会检查主机、准备依赖、校验发布文件并显示服务条款和隐私政策；阅读后按提示接受。补齐系统依赖时，可能单独询问 sudo 密码。
+3. 等待 Console 安装。已有 `rbnx` 时安装器使用现有安装；没有时会下载并构建 Robonix。首次构建可能较久。若安装器报告 Robonix 构建失败，先处理报错；Console 页面能打开不代表 Robonix 已安装成功。
 
-![仿真电脑安装 Console 时显示检查、下载和服务配置进度](/img/hub/console-install-progress.png)
+![Console 安装器显示检查、下载和服务配置进度](/img/hub/console-install-progress.png)
 
-*等安装完成并确认管理页面能打开。账户激活、模型字段与远程访问的详细说明见[安装 Console 并登录](#安装-console-并登录)。*
+*等待终端给出安装结果和管理页面地址；失败时保留报错和构建日志。*
 
-### 安装 TIAGo 配置并构建
+4. 按提示填写模型服务的三个字段。密钥输入时不会直接显示；不要把密钥写进公开仓库或截图。
 
-安装器完成后，先在仿真电脑终端检查 Robonix 源码路径：
+   | 字段 | 变量 | 填写内容 |
+   |---|---|---|
+   | VLM 终端 URL | `VLM_BASE_URL` | 模型服务的 Chat Completions 兼容接口地址 |
+   | VLM KEY | `VLM_API_KEY` | 该服务的访问密钥 |
+   | VLM 模型 | `VLM_MODEL` | 支持图像理解和工具调用的模型名 |
+
+   安装时跳过了这些字段，或需要修改时，打开 Console“设置 → 机器人环境变量”，添加这三项并保存。本机已有值时，安装器会询问是否保留，核对后选择。
+5. 安装结束后，在同一台电脑浏览器打开 [http://127.0.0.1:4880](http://127.0.0.1:4880)。填写 Hub 邮箱和密码，点“登录”；有两步验证时继续输入验证码。若提示尚未同意协议，先在 Hub 完成确认，再返回登录。
+
+![Console 登录页中的邮箱、密码和登录按钮](/img/hub/console-login.png)
+
+*登录后应能进入概览、配置等本机管理页面。*
+
+6. 回到终端检查 Robonix：
+
+   ```bash
+   export PATH="$HOME/.local/bin:$HOME/.cargo/bin:$PATH"
+   rbnx --version
+   rbnx path root
+   ```
+
+   版本命令应正常退出，源码路径应指向实际存在的 Robonix 仓库。若找不到 `rbnx` 或源码，先查看安装器记录的错误并修复安装，再安装整机配置。
+
+### 安装 Ranger 配置并完成构建
+
+1. 在本机 Console 打开“目录 → 机器人”，搜索 `Ranger`，找到“松灵 Ranger Mini V3 移动机器人”的**仿真 / MuJoCo**条目。核对包名为 `robonix.robot.agilex.ranger_with_piper_mujoco`，不要选择真机包。
+2. 查看条目的 README 和依赖，点下图①的“安装”，在确认框中核对内容和安装位置后确认。
+
+![松灵 Ranger Mini V3 MuJoCo 仿真条目及安装按钮](/img/hub/ranger-mujoco-install.png)
+
+*确认“仿真”和 MuJoCo 标记，点①处安装按钮。图片中的安装次数会变化。*
+
+3. 等待下载完成并进入“配置”。当前部署为空时安装到其中；已有内容时会新建部署，随后核对当前部署的名称。应能看到 `ranger_chassis`、`front_camera`、`wrist_camera`、`piper_ctl`、`mapping`、`nav2`、`explore` 和 `pick` 等条目。
+4. 在“设置”的部署列表中找到这套部署，复制其**绝对路径**。下文的 `DEPLOYMENT_DIR` 都替换成这个路径。在终端进入该目录：
+
+   ```bash
+   cd "DEPLOYMENT_DIR"
+   test -f robonix_manifest.yaml
+   test -f scripts/bootstrap.sh
+   test -f sim/start.sh
+   ```
+
+   三个文件检查均应成功；失败说明目录或下载内容不对，先核对安装结果，不要在其他仓库目录运行后面的脚本。
+5. 在同一终端检查 Robonix API 路径：
+
+   ```bash
+   export PATH="$HOME/.local/bin:$HOME/.cargo/bin:$PATH"
+   rbnx path robonix-api
+   ```
+
+   软件包会自动发现 API。若发现失败，在部署目录的 `.env` 中显式配置 `ROBONIX_SOURCE_PATH` 为实际 Robonix 源码绝对路径，或配置 `ROBONIX_API_PATH` 为其中 `pylib/robonix-api` 的绝对路径；两者按 README 的发现规则选择，不要填写其他版本的源码。
+6. 准备脚本使用的本机 `.env`。文件尚不存在时先复制模板；已有文件时直接编辑，不要覆盖自己的设置：
+
+   ```bash
+   test -f .env || cp .env.example .env
+   ```
+
+   用文本编辑器打开 `.env`，取消对应行的注释，填写与 Console 相同的模型地址、密钥和模型名。以下大写占位符必须替换为你自己的实际值：
+
+   ```dotenv
+   VLM_BASE_URL=MODEL_API_BASE_URL
+   VLM_API_KEY=MODEL_API_KEY
+   VLM_MODEL=VISION_MODEL_NAME
+   SIM_BACKEND=web
+   MUJOCO_RMW_IMPLEMENTATION=rmw_fastrtps_cpp
+   ```
+
+   `.env` 供初始化和仿真脚本读取，Console 中的模型变量供它启动的系统读取；两处保持一致。本机文件不提交 Git，也不作为分享附件。桥接容器默认使用 Fast DDS，保留这里的 `rmw_fastrtps_cpp`，不要套用 Webots 的 Zenoh 设置。
+7. 在部署根目录执行初始化构建：
+
+   ```bash
+   bash scripts/bootstrap.sh
+   ```
+
+   脚本会按锁文件安装前端依赖、下载 Playwright Chromium、构建 ROS 2 桥接镜像、验证六个本机原语和 Pick 技能，并执行部署的 `rbnx build`。等待脚本以状态码 0 结束，末尾提示构建完成。只点 Console“更新全部软件包”不能代替首次初始化中的前端和浏览器准备。
+8. 回到 Console“配置”，检查缺少的变量和参数；有修改时点“保存为新版本”，填写说明，检查差异后保存。在“设置 → 环境脚本”中登记本部署 `scripts/env.sh` 的**绝对路径**，使 Console 构建和运行前加载与该整机一致的环境。模型变量仍保持为上面填写的值。
+9. 在 Console“更新”点“更新全部软件包”，等待任务成功。失败时记录第一个失败的软件包和错误；终端初始化失败则查看终端输出。解决错误并重新构建成功后，再启动仿真。
+
+### 先启动 MuJoCo，再启动 Robonix
+
+在仿真电脑终端进入刚才的部署目录，启动默认 Web 后端：
 
 ```bash
 export PATH="$HOME/.local/bin:$HOME/.cargo/bin:$PATH"
-export ROBONIX_SOURCE_PATH="$(rbnx path root)"
-test -f "$ROBONIX_SOURCE_PATH/scripts/docker_base_image.sh"
-```
-
-`rbnx path root` 应输出已安装 Robonix 对应的源码目录，文件检查应成功。在 Console“设置 → 机器人环境变量”添加 `ROBONIX_SOURCE_PATH`，值填写上述目录的绝对路径。TIAGo 清单中的部分服务在构建时就要使用此路径，不能等到启动仿真时再设置；检查失败时先修复 Robonix 安装或按整机 README 准备对应源码。
-
-完成路径设置后，在 Console 操作：
-
-1. 在 Console 打开“目录 → 机器人”，搜索 `tiago_webots`。
-2. 对照上面的 Hub 条目确认是 TIAGo Webots，查看说明与 README，再点“安装到这台机器人”并确认。
-3. 下载完成进入“配置”后，核对当前部署，补齐提示缺少的模型等变量；修改参数后“保存为新版本”。
-4. 在“更新”点“更新全部软件包”，等待任务日志显示构建成功。
-
-![Console 中安装 TIAGo 等整机配置的操作入口](/img/hub/console-install-robot.png)
-
-*原图中的“安装到本机”在对应界面称为“安装到这台机器人”。安装前核对具体条目和目录。*
-
-当前部署为空时安装到其中；已有配置时新建部署并切换，原配置保留。远程包在构建时下载；失败时先查看第一个失败的软件包和报错，详见[构建并启动机器人](#构建并启动机器人)。
-
-### 先启动 Webots，再启动 Robonix
-
-在“设置”查看当前部署路径。将 `DEPLOYMENT_DIR` 替换为该目录的绝对路径，在仿真电脑终端执行：
-
-```bash
-export PATH="$HOME/.local/bin:$HOME/.cargo/bin:$PATH"
-export ROBONIX_SOURCE_PATH="$(rbnx path root)"
-test -f "$ROBONIX_SOURCE_PATH/scripts/docker_base_image.sh"
 cd "DEPLOYMENT_DIR"
 bash sim/start.sh
 ```
 
-`ROBONIX_SOURCE_PATH` 必须指向本机已安装 Robonix 对应的源码目录；上述文件检查必须成功。若 `rbnx path root` 没有返回可用路径，先按整机 README 准备正确源码，不能继续用空路径启动。也在 Console“设置 → 机器人环境变量”中填写同一路径，供该部署中引用此变量的软件包使用。
+保留这个终端，等待脚本报告就绪。默认场景为 `scenesmith_house_187`，浏览器界面地址为 [http://127.0.0.1:5180/?environment=scenesmith_house_187](http://127.0.0.1:5180/?environment=scenesmith_house_187)。应看到房间和 Ranger 机器人，而不是只有空白画面。
 
-保留终端，等待 Webots 窗口和传感器就绪。仿真脚本需要单独执行，额外参数按配置 README；不要把其他本体的视频启动方式直接套用到 TIAGo。
-
-回到 Console“概览”，核对 TIAGo 部署，点“启动”。状态应从“启动中”变为“运行中”；失败时查看本次运行日志。
-
-![Console 显示机器人运行中及 Client 所需的连接信息](/img/hub/console-running.png)
-
-*“运行中”表示 Robonix 已启动；仿真画面和传感器仍需另行确认。复制本机显示的连接值。*
-
-### 连接 Client 并完成相机任务
-
-在操作者电脑按本页[安装与使用 Client](#安装与使用-client)完成安装；同机运行时，保持 Client 的虚拟环境已激活，执行：
+在另一个终端检查桥接服务：
 
 ```bash
+curl -fsS http://127.0.0.1:8766/health
+```
+
+应返回健康状态 JSON；结合启动终端的就绪提示和实际画面检查。失败时查看部署目录下 `.runtime/bridge.log` 和 `.runtime/browser.log`，不要先启动机器人任务。
+
+回到 Console“概览”，核对当前是 Ranger 仿真部署，点“启动”，等待状态变为“运行中”。启动失败时打开本次运行日志，检查模型变量、环境脚本及仿真桥接状态。构建成功、桥接响应和 Robonix 运行中分别对应不同阶段，三项都要确认。
+
+在另一个终端验证能力注册：
+
+```bash
+cd "DEPLOYMENT_DIR"
+source scripts/env.sh
+rbnx caps -v
+```
+
+六个原语以及建图、导航、场景等提供方应正常注册。Explore、Pick 按需调用，初始显示 `INACTIVE` 不一定是错误；先检查传感器和基础服务是否就绪。
+
+### 安装 Client 并连接仿真机器人
+
+首次体验可以把 Client 装在同一台 Ubuntu 电脑上。先确认 Python 解释器不低于 **3.11**；系统默认 `python3` 不足时，先安装符合要求的解释器，将下文 `python3.11` 换成它的命令。
+
+在用于保存 Client 源码的目录打开新终端，执行：
+
+```bash
+sudo apt update
+sudo apt install -y libportaudio2 portaudio19-dev
+python3.11 --version
+git clone https://github.com/syswonder/robonix-client.git
+cd robonix-client
+git checkout --detach 739f8499
+python3.11 -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+pip install -e '.[audio]'
 robonix-client --robot-host 127.0.0.1
 ```
 
-打开 [http://127.0.0.1:7860](http://127.0.0.1:7860)，按 Console 显示的值填写 **Robot Host** 和 **Atlas Port**，点 **Connect** 等待在线；**Liaison Endpoint** 通常留空。
+创建虚拟环境提示缺少 `venv` 时，先安装该解释器对应的 venv 包，例如 `python3.11-venv`，再重试。Client 的音频依赖不代表 Ranger 整机带有语音能力：当前 Ranger 仿真包未配置音频，本路线使用文本交互。
 
-先发送“目前有哪些能力？”，收到回复并确认相机与图像理解能力可用后，再发送：
+打开 [http://127.0.0.1:7860](http://127.0.0.1:7860)，填写 **Robot Host** 为 `127.0.0.1`，**Atlas Port** 使用 Console 概览给出的实际值（默认 `50051`），**Liaison Endpoint** 留空，点 **Connect**，等待在线。
 
-> 用头部相机拍一张前方的照片，告诉我看到了什么
+Client 在另一台电脑时，用机器人实际地址。在 Console 概览按提示“允许其他机器连接”并确认，重启 Robonix 后生效；还要确保 Atlas 和发现的组件都能从该电脑访问。Console 的管理页面隧道不能代替这些组件连接，只在可信网络中开放。
 
-![Client 提交 TIAGo 头部相机任务并收到结果](/img/hub/client-camera-task.png)
+### 观察相机并提交探索任务
 
-*等最终回复，并对照 Webots 画面确认描述相符。“已提交”不代表任务完成。执行记录与取消方法见[连接机器人，完成第一条任务](#连接机器人完成第一条任务)。*
+1. 先发送“目前有哪些能力？”，等待机器人回复，核对它识别的是 Ranger Mini V3 和 Piper 仿真本体。
+2. 再发送“用前置相机拍一张照片，告诉我看到了什么”，等待最终回复，并对照 MuJoCo 画面检查；相机提供方是 `front_camera`。
+3. 确认传感器、建图和导航正常后，发送“请自由探索当前房间，最多 300 秒，速度不超过 0.18 米/秒，并返回任务 ID”。保留返回的 `run_id`，随后请求“查询这个探索任务的状态”，携带同一个 ID，不要重复发起多个探索任务。
 
-Client 不在仿真电脑上时，使用 Console 显示的实际机器人地址，并按[准备机器人端](#准备机器人端)开放所需组件连接；Console 管理页面的 SSH 隧道不能代替 Client 的连接。
+![Client 接收 Ranger 探索请求、说明执行步骤并调用探索能力](/img/hub/ranger-client-explore.png)
 
-### 结束仿真或继续体验
+*①是已加入运行中任务的请求，②③是机器人的响应；截图底部显示正在调用 Explore。它说明任务开始处理，不能仅凭这张图认定探索已完成。*
 
-先在 Client 点 **ABORT ALL TASKS**，等待回到空闲，再在 Console“概览”停止 Robonix，最后按整机 README 结束仿真进程。
+在仿真画面中检查机器人是否移动、是否避开障碍，结合任务进度、最终状态和日志确认结果。探索状态为 `SUCCEEDED`、`FAILED`、`CANCELED` 或 `TIMEOUT` 时才表示该次探索结束。探索过程中不要同时发送手动底盘、其他导航或抓取命令；要改做别的任务，先请求“取消探索任务”，携带同一个 `run_id`，确认调用探索取消能力并查询到结束状态，检查机器人停止。当前包的抓放能力只针对环境中登记的可交互动态物体，不代表任意家具都能抓取。
 
-已跑通相机任务后，可继续本页的[创建并保存室内地图](#创建并保存室内地图)、[指定导航目标](#在地图上指定导航目标)、[标注房间](#标注房间并查看场景)。这些功能仍需各自的服务和配置满足前提。
+### 结束仿真
+
+探索仍在运行时，先用同一个 `run_id` 请求取消探索并查询其结束状态；`ABORT ALL TASKS` 用于取消 Client 当前执行任务，不能仅凭这个按钮推断异步探索已停止。确认仿真机器人停止后，在 Console“概览”点“停止”。保持配置和日志需要时先保存，随后在仿真终端按 `Ctrl+C`；也可以在部署根目录执行：
+
+```bash
+bash sim/stop.sh
+```
+
+Robonix 与仿真是独立的运行过程：停止仿真脚本不会自动停止 Robonix，停止 Console 中的 Robonix 也不会自动关闭仿真。
 
 ### 观看安装与仿真部署演示
 
-下面的视频以 **Ranger MuJoCo** 仿真本体包演示 Console 下载、安装、部署本体包和启动 Robonix，可帮助理解完整操作。它展示的本体不是 TIAGo Webots；本节 TIAGo 的环境准备和 `sim/start.sh` 步骤仍按上文与 TIAGo README 操作。
+下面的视频展示 Ranger Mini V3 与 Piper 的 Console 安装、整机部署和交互过程。跟随操作时使用本机的路径、模型设置和地址。
 
-<video controls preload="none" style={{width: '100%'}} aria-label="Ranger MuJoCo 的 Console 安装与仿真部署演示">
+<video controls preload="none" style={{width: '100%'}} aria-label="Ranger Mini V3 MuJoCo 的 Console 安装与仿真部署演示">
   <source src={useBaseUrl('/video/simulation-start-demo.mp4')} type="video/mp4" />
   浏览器不支持视频播放时，可下载视频后观看。
 </video>
@@ -145,9 +252,9 @@ Client 不在仿真电脑上时，使用 Console 显示的实际机器人地址�
 
 在 [Hub 机器人目录](https://hub.robonix.ai/discover/robot)搜索型号，打开整机条目查看型号、传感器、计算平台、真机运行方式、依赖和 README。
 
-![Hub 机器人目录中的分类与型号搜索入口](/img/hub/robot-catalog.png)
+![Hub 中的松灵 Ranger Mini V3 仿真条目](/img/hub/ranger-mujoco-install.png)
 
-*截图以 TIAGo 搜索结果展示目录位置；真机路线应搜索并核对自己的型号，确认条目适用于实体机器人。*
+*截图是 Ranger 的仿真配置。真机路线应搜索自己的实体型号，核对驱动和真机运行说明，不能直接安装图中的仿真包替代适配。*
 
 - **找到适用整机配置**：继续下面的安装流程。
 - **已有自己的部署仓库**：按 README 准备目录，在“设置”[登记已有目录](#登记已有目录)，再检查配置和构建。
@@ -251,7 +358,7 @@ curl -fsSL https://hub.robonix.ai/install | bash
 | VLM KEY | `VLM_API_KEY` | 访问密钥 |
 | VLM 模型 | `VLM_MODEL` | 模型名 |
 
-Pilot 和配置助手使用这组设置。配置助手要求模型兼容 Chat Completions 并支持工具调用；[Webots 教程](#没有实体机器人运行仿真)的图像任务还要求视觉语言模型。三项只保存在本机，不随部署上传。
+Pilot 和配置助手使用这组设置。配置助手要求模型兼容 Chat Completions 并支持工具调用；[Ranger 仿真路线](#没有实体机器人运行仿真)的图像任务还要求视觉语言模型。三项只保存在本机，不随部署上传。
 
 如果本机已经设置了这三项变量，安装器会显示已有值，密钥只显示末 4 位，并询问是否保留。选择不保留后可以逐项重新填写；某一项直接回车表示继续使用原值。安装时也可以跳过，之后在“设置 → 机器人环境变量”中补填。
 
@@ -281,22 +388,11 @@ ssh -N -L 4880:127.0.0.1:4880 ROBOT_USER@ROBOT_HOST
 
 在机器人分类浏览型号，或[按名称搜索](https://hub.robonix.ai/discover?kind=robot)。打开条目，查看说明、版本、“使用的软件包”和仓库 README，核对型号、传感器、计算平台及真机或仿真环境。
 
-例如，[TIAGo Webots](https://hub.robonix.ai/package/robonix.robot.pal_robotics.tiago_webots) 是仿真配置；同名真机需要自己的适配。目录中的软件包链接可以继续查看具体功能和依赖。
+例如，[Ranger Mini V3 MuJoCo](https://hub.robonix.ai/package/robonix.robot.agilex.ranger_with_piper_mujoco) 是带 Piper 机械臂的仿真配置；真机需要自己的驱动和适配。目录中的软件包链接可以继续查看具体功能和依赖。
 
-<details>
-<summary>查看机器人条目与安装确认</summary>
+![Hub 中的 Ranger Mini V3 MuJoCo 条目与安装入口](/img/hub/ranger-mujoco-install.png)
 
-![Hub 中的机器人条目搜索结果](/img/hub/hub-robot-catalog-detail.png)
-
-![机器人条目的说明、版本和使用的软件包](/img/hub/hub-robot-package.png)
-
-*先看条目的型号和运行方式，再确认安装。*
-
-</details>
-
-![Hub 机器人目录：选择分类并搜索型号](/img/hub/robot-catalog.png)
-
-*在 Hub [搜索 TIAGo](https://hub.robonix.ai/discover?kind=robot&q=tiago)的结果。*
+*检查“仿真”和 MuJoCo 标记，以及整机 README。*
 
 #### 在 Console 安装
 
@@ -304,9 +400,9 @@ ssh -N -L 4880:127.0.0.1:4880 ROBOT_USER@ROBOT_HOST
 2. 点“安装到这台机器人”，核对确认框中的内容和目录，再确认。
 3. 等待下载完成，页面进入“配置”，并生成第一个配置版本。
 
-![Console 机器人目录中的整机安装按钮](/img/hub/console-install-robot.png)
+![Ranger 仿真整机条目的安装按钮](/img/hub/ranger-mujoco-install.png)
 
-*截图中的“安装到本机”（1），在当前界面叫“安装到这台机器人”。*
+*点①处“安装”，核对目标部署后确认。*
 
 ![确认整机配置安装内容](/img/hub/console-install-confirm.png)
 
@@ -455,7 +551,7 @@ Hub Cloud 提供只读 REST API，地址前缀是 `https://hub.robonix.ai/api/v1
 
 #### 构建所需软件包
 
-构建 TIAGo 前，先按[仿真路线](#安装-tiago-配置并构建)设置 Console 的 `ROBONIX_SOURCE_PATH`，确认它指向已安装版本的源码目录。其他整机同样先补齐 README 要求的构建变量。
+Ranger 仿真首次使用时，先在部署根目录执行 `bash scripts/bootstrap.sh`，准备前端、Playwright 浏览器及桥接镜像；完成本机 `.env` 和 Console 环境脚本设置后，再使用“更新”页。其他整机按自己的 README 补齐构建变量与外部依赖。
 
 打开“更新”，点“更新全部软件包”。Console 会拉取代码并逐个构建；随整机安装的包显示“本地目录”，尚未下载的远程包显示“未下载”。
 
@@ -472,17 +568,9 @@ Hub Cloud 提供只读 REST API，地址前缀是 `https://hub.robonix.ai/api/v1
 
 #### 仿真先启动环境
 
-使用 TIAGo Webots 时，在启动 Robonix 前先启动仿真。将 `DEPLOYMENT_DIR` 换成“设置”中显示的部署目录，在机器人主机的终端执行：
+Ranger Mini V3 MuJoCo 使用独立仿真进程。先完成初始化，在部署根目录执行 `bash sim/start.sh`，等待默认 Web 界面 `http://127.0.0.1:5180/?environment=scenesmith_house_187` 与桥接服务 `http://127.0.0.1:8766/health` 就绪，再启动 Robonix。配置和完整流程见[仿真路线](#没有实体机器人运行仿真)。
 
-```bash
-export PATH="$HOME/.local/bin:$HOME/.cargo/bin:$PATH"
-export ROBONIX_SOURCE_PATH="$(rbnx path root)"
-test -f "$ROBONIX_SOURCE_PATH/scripts/docker_base_image.sh"
-cd "DEPLOYMENT_DIR"
-bash sim/start.sh
-```
-
-`rbnx path root` 必须返回实际安装对应的源码目录，文件检查需成功；在 Console 的机器人环境变量中填写同一 `ROBONIX_SOURCE_PATH`。保持终端运行，等待仿真和传感器就绪。其他仿真按整机 README 操作；完整示例见[运行 TIAGo 仿真](#没有实体机器人运行仿真)。真机完成自己的驱动准备后，直接进入下一步。
+其他仿真按各自整机 README 操作，不混用环境变量和启动脚本。真机完成自己的驱动准备后，进入下一步。
 
 #### 启动 Robonix
 
@@ -741,13 +829,11 @@ Linux / macOS 可用 `nc -vz ROBOT_HOST 50051` 检查默认 Atlas 端口；将�
 
 发送“目前有哪些能力？”，收到回复后，有相机和图像理解能力的机器人可以继续输入：
 
-> 用头部相机拍一张前方的照片，告诉我看到了什么
+> 用前置相机拍一张照片，告诉我看到了什么
 
-换用其他机器人时，使用它实际安装的相机。也可以问“你能看到什么？”。相机和相关软件可在 [Hub 目录](https://hub.robonix.ai/discover)查看。
+Ranger 使用 `front_camera`；换用其他机器人时，使用它实际安装的相机。也可以问“你能看到什么？”。相机和相关软件可在 [Hub 目录](https://hub.robonix.ai/discover)查看。
 
-![Client 中发送头部相机拍照任务并收到结果](/img/hub/client-camera-task.png)
-
-*发送任务后等待最终回复，再对照现场或仿真画面检查结果。*
+发送任务后等待最终回复，再对照现场或仿真画面检查结果。Ranger 的探索交互示例见[仿真路线](#观察相机并提交探索任务)。
 
 #### 检查任务结果
 
@@ -755,7 +841,7 @@ Linux / macOS 可用 `nc -vz ROBOT_HOST 50051` 检查默认 Atlas 端口；将�
 
 #### 调整或结束任务
 
-任务执行中，再点 **Send** 会把新要求加入当前任务。要取消，点红色 **ABORT ALL TASKS**，等界面回到空闲。需要停止整套系统时，再到 Console“概览”点“停止”。
+任务执行中，再点 **Send** 会把新要求加入当前任务。要取消当前执行任务，点红色 **ABORT ALL TASKS**，等界面回到空闲。异步探索另有自己的 `run_id` 和取消能力，还需请求取消探索并查询结束状态，不能只看 Client 是否空闲。需要停止整套系统时，再到 Console“概览”点“停止”。
 
 真机移动或抓取前，先确认限速、停止行为、急停和测试区域；Client 取消按钮不能替代硬件急停。
 
@@ -763,7 +849,7 @@ Linux / macOS 可用 `nc -vz ROBOT_HOST 50051` 检查默认 Atlas 端口；将�
 
 ## 运行之后：建图、导航与场景
 
-先完成所选路线的连接与任务检查，再使用本体已具备的建图、导航与场景功能。下面保留原操作步骤和图片；这些功能不是安装 Console 后自动具备的能力。
+先完成所选路线的连接与任务检查，再使用本体已具备的建图、导航与场景功能。Ranger 仿真清单包含建图、导航、场景和探索；其他本体需分别核对依赖。这些功能不是安装 Console 后自动具备的能力。
 
 ### 建图、导航与场景
 
@@ -781,11 +867,11 @@ Linux / macOS 可用 `nc -vz ROBOT_HOST 50051` 检查默认 Atlas 端口；将�
 
 #### 操作前检查
 
-确认底盘、传感器和所需服务已正常启动；导航前还需定位与现场一致。移动时清空通道并确认急停可用。第一次使用可先按[TIAGo 仿真教程](#没有实体机器人运行仿真)准备环境。
+确认底盘、传感器和所需服务已正常启动；导航前还需定位与现场一致。移动时清空通道并确认急停可用。第一次使用可先按[Ranger 仿真教程](#没有实体机器人运行仿真)准备环境。
 
 ### 创建并保存室内地图
 
-本节把原[建图与定位指南](../components/mapping.md)和[场景界面说明](../components/scene.md#操作界面怎么用)整理为操作步骤。完成后得到一张可重新加载、用于定位的地图。
+本节把[建图与定位指南](../components/mapping.md)和[场景界面说明](../components/scene.md#操作界面怎么用)整理为操作步骤。完成后得到一张可重新加载、用于定位的地图。
 
 #### 准备传感器与服务
 
@@ -820,7 +906,7 @@ ssh -N -L 50107:127.0.0.1:50107 ROBOT_USER@ROBOT_HOST
 
 使用这台机器人已经验证的控制方式，低速走过房间和走廊。确认通道安全、急停可用，观察地图与现场是否相符。
 
-原 Webots 教程提供[RViz2 检查方法](quickstart.md#终端-1webotsros-2-与-rviz2)。自动探索需另有 [探索技能](https://hub.robonix.ai/package/robonix.skill.explore)及其建图、导航依赖，不能仅凭建图服务自动完成。
+Ranger 可以按本页的[探索步骤](#观察相机并提交探索任务)建图。自动探索需要 [探索技能](https://hub.robonix.ai/package/robonix.skill.explore)及建图、导航依赖，不能仅凭建图服务自动完成；探索过程中不要叠加手动底盘、其他导航或抓取命令。
 
 #### 保存为新的地图
 
@@ -834,37 +920,40 @@ ssh -N -L 50107:127.0.0.1:50107 ROBOT_USER@ROBOT_HOST
 
 界面依次检查地图文件、切换到定位模式、等待新的地图画面并恢复房间与对象。完成后检查机器人位置是否与现场一致；明显不符时，点 **Pose estimate**，再点地图上的实际位置，等待定位稳定。
 
-定位正确后，可[指定导航目标](#在地图上指定导航目标)或[标注房间](#标注房间并查看场景)。参数和排错见[原建图指南](../components/mapping.md)。
+定位正确后，可[指定导航目标](#在地图上指定导航目标)或[标注房间](#标注房间并查看场景)。参数和排错见[建图指南](../components/mapping.md)。
 
 ### 在地图上指定导航目标
 
-[Webots 教程](quickstart.md#终端-1webotsros-2-与-rviz2)使用 RViz2 在地图上点选目标，查看导航结果。该示例的启动脚本包含目标转发程序；其他部署需先确认自己的目标输入方式。
+先确定坐标来自当前已加载的地图，再提交导航任务。Ranger 通过 Client 的文本任务调用导航服务；Webots 教程的 RViz2 目标按钮属于另一套部署的接口，不能假定 Ranger 启动脚本已经提供同样的 RViz2 窗口与目标中继。
 
 #### 准备地图和导航
 
-确认已[加载地图并正确定位](#重新加载并检查定位)，底盘里程计和雷达正常，[导航服务](https://hub.robonix.ai/package/robonix.service.navigation)使用适合本机器人的完整参数。原参考实现面向室内导航。
+确认已[加载地图并正确定位](#重新加载并检查定位)，底盘里程计和雷达正常，[导航服务](https://hub.robonix.ai/package/robonix.service.navigation)使用适合本机器人的完整参数。这里的参考实现面向室内导航。
 
-在 RViz2 中检查地图、雷达与现场是否吻合，确认目标位于可通行区域。首次测试选择附近目标，清空通道并确认急停可用。
+在地图界面确认机器人位置与环境相符，选取附近可通行区域作为目标，记录其地图坐标 `x`、`y` 和最终朝向 `yaw`。`x`、`y` 的单位是米，`yaw` 是弧度，不要照抄另一张地图中的示例坐标。真机清空通道并确认急停可用。
 
-#### 在地图上点选目标
+#### 提交目标并检查结果
 
-1. 在 Webots 示例的 RViz2 顶部工具栏选择 **2D Goal Pose**。
-2. 在地图上点选目标，观察 **GlobalPlan** 路径和机器人运动。
-3. 在 **Navigation 2** 面板查看导航状态。
+在 Client 中描述导航任务，包含刚才选取的坐标和朝向，例如“导航到地图坐标 x=目标横坐标、y=目标纵坐标，最终朝向 yaw=目标朝向”。发送前把中文占位内容换成实际数值。Ranger 的整机 README 提供了地图坐标导航任务的用法；实际目的地由当前地图决定。
 
-![原 Webots 示例中的 RViz2 地图、路径与导航面板](/img/ui/rviz2-live.webp)
+等待规划与执行，检查任务返回状态，并对照仿真画面或现场确认机器人是否在目标附近停止。到达容差由导航参数决定。“已提交”或模型回复“开始导航”不能作为到达证明。
 
-这个按钮通过示例中的 `goal_pose_relay.py` 把目标交给 Nav2。不能仅凭界面上有目标按钮，就判断自建部署也已连通；接入要求见[原本体指南](../integration-guide/vendor-onboarding.md#74-使用-rviz2-验证地图定位与导航)。
+需要取消导航时，请求取消当前导航并检查导航状态；Client 当前执行任务可用 **ABORT ALL TASKS** 取消，随后仍需确认导航任务结束和底盘停止。探索仍在运行时，先用其 `run_id` 请求取消探索并查询到结束状态，再提交导航。真机出现危险时使用物理急停。
 
-#### 检查结果或取消导航
+<details>
+<summary>使用 Webots 部署时的 RViz2 操作</summary>
 
-确认机器人在目标附近停止，并检查导航状态。到达容差由这台机器人的导航参数决定。
+[Webots 命令行教程](quickstart.md#终端-1webotsros-2-与-rviz2)使用 RViz2 的 **2D Goal Pose** 点选目标，通过 `goal_pose_relay.py` 转交 Nav2，在 **GlobalPlan** 和 **Navigation 2** 中检查路径与状态。仅适用于已经接好该中继的部署，不是本节 Ranger 仿真的必做步骤。
 
-需要取消时，使用 **Navigation 2** 面板取消当前目标；它只取消导航，不会停止其他组件。真机出现危险时使用物理急停。
+![Webots 示例中的 RViz2 地图、路径与导航面板](/img/ui/rviz2-live.webp)
+
+*使用前核对该部署自己的 RViz2 与目标中继配置。*
+
+</details>
 
 | 现象 | 先检查 |
 |---|---|
-| 点选后没有运动 | 当前部署是否具备目标转发程序，Nav2 是否就绪 |
+| 提交目标后没有运动 | 任务是否被执行、Nav2 是否就绪、是否仍有探索任务 |
 | 找不到路线 | 地图、定位、目标位置和障碍物 |
 | 目标反复取消 | 导航日志中的速度守卫和取消原因 |
 | 到达位置偏离 | 初始定位、地图匹配情况与目标容差 |
@@ -920,7 +1009,7 @@ ssh -N -L 50107:127.0.0.1:50107 ROBOT_USER@ROBOT_HOST
 
 [Hub](https://hub.robonix.ai/discover)提供目录和云端备份；Console 管理机器人本机的配置与运行。
 
-第一次使用时，先按[安装与连接路线](#有实体机器人安装并使用)完成 Console 安装、配置与运行，再连接 Client。还没有机器人时，直接从[运行 TIAGo 仿真](#没有实体机器人运行仿真)开始。
+第一次使用时，先按[安装与连接路线](#有实体机器人安装并使用)完成 Console 安装、配置与运行，再连接 Client。还没有机器人时，直接从[运行 Ranger Mini V3 MuJoCo 仿真](#没有实体机器人运行仿真)开始。
 
 #### 运行后的日常管理
 
@@ -960,7 +1049,7 @@ ssh -N -L 50107:127.0.0.1:50107 ROBOT_USER@ROBOT_HOST
 
 一套部署是一个目录，包含部署清单、本机软件包、配置文件和仿真脚本等。每套部署有独立的配置历史，可分别保留仿真、真机或实验配置。
 
-典型目录包括 `robonix_manifest.yaml`、`primitives/`、`services/`、`scripts/`、`config/` 和 `sim/`。beta.22 初装时使用名为 `Default deployment` 的默认部署。新版本的默认数据根目录已改为 `robonix-console`；不要照抄旧截图中的 `robonix-hub` 路径，以“设置 → 部署目录”的实际名称和路径为准。
+典型目录包括 `robonix_manifest.yaml`、`primitives/`、`services/`、`scripts/`、`config/` 和 `sim/`。默认数据根目录为 `robonix-console`，部署名称和目录以“设置”中的实际值为准，不照抄截图中的主机名和旧路径。
 
 #### 确认当前部署
 
@@ -1258,120 +1347,3 @@ Console 连不上 Hub 时，可“下载反馈包”另行交给维护者。网�
 | `rbnx` | Robonix 的命令行工具 |
 
 目录中的功能是否适用，以机器人型号、依赖和 README 为准；页面入口以当前 Console 和 Hub 的显示为准。
-
-## 管理员补充：Hub 管理后台
-
-下面只供 Hub Cloud 管理员查阅，普通用户无需完成这些操作即可走通仿真或真机路线。
-
-### 管理后台
-
-以下是 beta.22 使用资料中的 Hub Cloud 管理员操作。普通账户看不到管理入口；后续版本的实际权限和界面以管理端为准。
-
-#### 进入管理后台
-
-登录 Hub Cloud 后，侧栏下方会出现“管理”分组。管理后台包含概览、用户、反馈、邮件、审计日志、目录同步、监控和站点设置。
-
-进入管理后台需要两步验证。尚未绑定身份验证器时，先到“账户与安全”完成绑定，再重新登录。
-
-#### 查看概览
-
-“概览”显示活跃用户、待激活账户、已禁用账户和管理员数量，以及机器人、部署快照和目录软件包数量。页面还显示最近 24 小时被拒绝的请求、最近一次目录同步结果、待删除账户数量和服务版本。
-
-![管理后台概览](/img/hub/admin-overview.png)
-
-#### 管理用户
-
-##### 邀请用户
-
-在“邀请用户”中每行填写一位用户的邮箱和姓名，勾选已告知并取得同意，再点“发送邀请”。结果会逐行显示为已邀请、已存在或无效；激活链接在 72 小时内有效。
-
-![管理后台邀请用户和用户列表](/img/hub/admin-users.png)
-
-##### 查找和处理账户
-
-用户列表支持按邮箱或姓名搜索，并按全部、活跃、待激活和已禁用筛选。列表显示角色、状态、邀请邮件送达情况、机器人数量、云端用量、最近活动和创建时间，也可以按列排序。
-
-每行末尾的操作菜单只显示当前可用的操作：
-
-| 操作 | 作用 |
-|---|---|
-| 重发邀请 | 给尚未激活的账户重新发送邀请 |
-| 强制下线 | 结束该账户的全部登录会话 |
-| 重置两步验证 | 清除身份验证器，让用户下次登录时重新绑定 |
-| 禁用 / 启用 | 禁止或恢复登录；禁用时已有会话同时失效 |
-| 设为管理员 / 取消管理员 | 调整账户角色，用户需要重新登录 |
-| 设置存储配额 | 为账户设置单独上限；留空使用默认值 |
-| 删除账户 | 永久删除账户及其上传的机器人和版本历史，无法撤销，需要输入邮箱确认 |
-| 撤销删除 | 取消尚未执行的账户删除申请 |
-
-除“重发邀请”外，账户操作要求管理员在最近 15 分钟内重新登录。管理员不能操作自己的账户，唯一的管理员不能被禁用或取消管理员。
-
-![用户操作菜单](/img/hub/admin-user-actions.png)
-
-#### 处理反馈
-
-“反馈”默认显示待处理项目，也可以按反馈对象和状态筛选。每条记录显示状态、时间、反馈对象、提交人、来源机器和附件大小。
-
-![管理后台反馈列表](/img/hub/admin-feedback.png)
-
-打开反馈后，左侧查看机器信息和附件，右侧在“处理”中选择待处理、处理中或已关闭，填写备注并保存。日志等文本附件可以直接查看；过大的文件先显示末尾 512 KiB，也可以下载完整压缩包。处理备注只对管理员可见。
-
-![管理后台反馈详情](/img/hub/admin-feedback-detail.png)
-
-#### 查看邮件和审计日志
-
-“邮件”分为两类：
-
-- **邀请与通知**：Hub Cloud 发出的邀请和反馈通知。
-- **验证和账户恢复邮件**：账户服务发出的验证和恢复邮件。
-
-每封邮件显示时间、收件人、状态、尝试次数和失败原因。状态包括排队中、发送中、已发送、失败和已放弃。用户没有收到激活邮件时，先在这里查找。
-
-![邮件记录](/img/hub/admin-mail.png)
-
-“审计日志”记录账户、机器人、令牌和管理操作。每条记录包含时间、操作人、动作、对象、结果和来源 IP 的哈希值。可以按动作前缀（例如 `admin.`）以及成功或拒绝结果筛选，点“加载更早的记录”继续查看。
-
-![审计日志](/img/hub/admin-audit-log.png)
-
-#### 同步软件包目录
-
-目录会定期从软件包仓库同步：
-
-- “立即同步”只重新读取发生变化的软件包。
-- “全量同步”重新读取全部软件包。
-
-同步记录显示起止时间、总数、成功数、失败数和同步方式。读取失败的软件包及原因会单独列出。
-
-![目录同步记录](/img/hub/admin-catalog-sync.png)
-
-#### 查看服务监控
-
-监控页顶部显示当前告警及级别。图表可以切换 1 小时、6 小时、24 小时和 7 天，包含请求量、5xx 错误占比、响应时间、限流请求、活跃用户、上传机器人、CPU、内存、磁盘、数据库连接、最近备份和发送失败邮件等指标。每张图右上角显示当前值。
-
-![服务监控](/img/hub/admin-monitoring.png)
-
-#### 修改站点设置
-
-| 设置 | 作用 |
-|---|---|
-| 全站只读 | 维护期间拒绝普通页面的写操作，登录和退出不受影响 |
-| 顶部公告 | 显示在每个页面顶部，留空则不显示，最多 300 字 |
-| 每个 IP 每分钟的请求上限 | 超过后返回 429，一分钟后恢复；范围为 30–10000 |
-| 每个 IP 每小时上传机器人的次数上限 | 范围为 1–1000 |
-
-修改后点“保存”。每次保存都会写入审计日志。
-
-![站点设置](/img/hub/admin-site-settings.png)
-
-## 版本与资料依据
-
-| 内容 | 依据与边界 |
-|---|---|
-| Console 安装与路径 | 2026-10-28 的[在线安装器](https://hub.robonix.ai/install)及[发布清单](https://hub.robonix.ai/download/RELEASE)，当日 Console 为 `0.1.0-beta.47` |
-| 配置、历史、云端、助手与管理员操作 | 《RobonixHub 内测使用手册》2026-10-03、`0.1.0-beta.22`；保留该版本的操作语义，按钮名称可能不同 |
-| TIAGo 部署 | [整机目录条目](https://hub.robonix.ai/package/robonix.robot.pal_robotics.tiago_webots)及其[源码快照](https://github.com/syswonder/robot-pal_robotics-tiago_webots/tree/dda9f64ceeb9776f5c4091eb5c85e26dcace32c7)；与原书固定源码教程分别检查兼容条件 |
-| Client 安装与交互 | [Client `739f8499`](https://github.com/syswonder/robonix-client/tree/739f84999c5aef120f2ca46641952fb4bee45d93)及原书[图形客户端指南](client.md) |
-| 建图、导航与场景 | 原书[建图](../components/mapping.md)、[导航](../components/navigation.md)、[场景](../components/scene.md)指南，适用版本按各指南声明 |
-| 演示视频 | 2026-10-22 提供的 Ranger MuJoCo 操作录像；用于展示操作，不是 TIAGo 或所有真机的验收记录 |
-
-本页核查的是资料、命令写法与链接；没有据此宣称完成 beta.47 的全部功能、真机运动或云端操作实测。运行时遇到版本差异，先保留软件版本、整机配置版本与日志，再按本页排错流程处理。
