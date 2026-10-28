@@ -28,7 +28,9 @@ import TabItem from '@theme/TabItem';
 **第一次使用，先读所选路线。** 需要每个按钮和设置的完整操作时，跳到本页的[安装、配置与交互详解](#安装配置与交互详解)。运行后继续[建图、导航与场景](#运行之后建图导航与场景)或[日常管理](#日常管理部署历史与云端备份)。所有这些操作都在本页，右侧目录可直接定位。
 
 :::note[版本与截图]
-Hub / Console 的操作依据 `0.1.0-beta.22` 使用资料，截图沿用原操作图片；旧名称在图注中对照。不同版本以实际界面和整机 README 为准。原书命令行教程的固定源码验收范围不等于所有 Hub 配置的支持范围。
+安装命令与路径于 2026-10-28 对照在线安装器核查；当日发布清单为 Console `0.1.0-beta.47`。配置、历史、云端与管理员操作依据 `0.1.0-beta.22` 使用资料整理，图片保留当时界面，不能作为 beta.47 的逐项验收结果。Client 操作对应原书的 `739f8499`；建图、导航和场景沿用原书各组件声明的版本。
+
+命令行快速上手使用固定 Robonix 源码 `223675d9`；在线安装器在没有已安装 Robonix 时采用发布清单指定的版本，当日为 `v1.1.0-beta.1`。两条安装路径的版本不同，不要混用源码目录、二进制和配置；Hub 配置与所安装版本是否兼容，仍需按整机 README 检查。
 :::
 
 ## 没有实体机器人：运行仿真
@@ -75,9 +77,13 @@ curl -fsSL https://hub.robonix.ai/install | bash
 在“设置”查看当前部署路径。将 `DEPLOYMENT_DIR` 替换为该目录的绝对路径，在仿真电脑终端执行：
 
 ```bash
+export ROBONIX_SOURCE_PATH="$(rbnx path root)"
+test -f "$ROBONIX_SOURCE_PATH/scripts/docker_base_image.sh"
 cd "DEPLOYMENT_DIR"
 bash sim/start.sh
 ```
+
+`ROBONIX_SOURCE_PATH` 必须指向本机已安装 Robonix 对应的源码目录；上述文件检查必须成功。若 `rbnx path root` 没有返回可用路径，先按整机 README 准备正确源码，不能继续用空路径启动。也在 Console“设置 → 机器人环境变量”中填写同一路径，供该部署中引用此变量的软件包使用。
 
 保留终端，等待 Webots 窗口和传感器就绪。仿真脚本需要单独执行，额外参数按配置 README；不要把其他本体的视频启动方式直接套用到 TIAGo。
 
@@ -143,7 +149,7 @@ Client 不在仿真电脑上时，使用 Console 显示的实际机器人地址�
 
 ### 安装 Console 与整机配置
 
-在机器人主机用普通用户执行本页[安装 Console](#安装-console-并登录)的命令，完成账户和模型设置。安装器支持 `x86_64` 和 `aarch64`，包括 Jetson；机器人驱动和依赖仍由对应 README 确定。
+在机器人主机用普通用户执行本页[安装 Console](#安装-console-并登录)的命令，完成账户和模型设置。当前安装器仅支持 Linux 的 `x86_64` 和 `aarch64`，包括 Jetson；机器人驱动和依赖仍由对应 README 确定。
 
 本机浏览器访问 `127.0.0.1:4880`；远程电脑管理时按[打开 Console](#打开-console)建立 SSH 转发，再登录。
 
@@ -199,13 +205,13 @@ Client 不在仿真电脑上时，使用 Console 显示的实际机器人地址�
 
 #### 在目标机器安装
 
-安装器支持 `x86_64` 和 `aarch64`（包括 Jetson）。在机器人主机上，以运行 Robonix 的普通用户执行：
+当前安装器仅支持 Linux 的 `x86_64` 和 `aarch64`（包括 Jetson）。在机器人主机上，以运行 Robonix 的普通用户执行：
 
 ```bash
 curl -fsSL https://hub.robonix.ai/install | bash
 ```
 
-不要使用 root 或在命令前加 `sudo`。安装器只会在补充系统软件包时询问权限；之后按顺序检查主机、校验发布文件、显示许可协议、安装 Console、设置当前用户的自动启动服务并检查页面是否响应。
+不要使用 root 或在命令前加 `sudo`。安装器补充系统依赖或构建工具时会按需询问权限；之后按顺序检查主机、校验发布文件、显示服务条款和隐私政策、安装 Console、设置当前用户的自动启动服务并检查页面是否响应。
 
 安装过程会依次完成以下工作：
 
@@ -213,7 +219,7 @@ curl -fsSL https://hub.robonix.ai/install | bash
 |---|---|
 | 检查本机 | 识别用户、处理器架构、系统版本、服务地址和安装位置 |
 | 准备系统软件包 | 检查 Git、curl、签名校验工具、压缩工具、Python 虚拟环境和终端界面工具；缺少时补齐 |
-| 确认许可协议 | 校验发布签名，阅读并接受许可协议 |
+| 确认许可协议 | 校验发布签名，阅读并接受服务条款和隐私政策 |
 | 下载 Console | 按 `x86_64` 或 `aarch64` 选择版本并校验摘要与签名 |
 | 准备 Robonix | 已安装时直接使用；未安装时下载源码并构建 |
 | 启动服务 | 把 Console 作为当前用户的服务运行，并设置开机自启 |
@@ -224,7 +230,7 @@ curl -fsSL https://hub.robonix.ai/install | bash
 
 *安装器会显示当前步骤和进度；遇到错误时先保留终端输出。*
 
-已有 Robonix 时安装器会直接使用；没有时会在 `~/.local/share/robonix-hub/robonix` 下载并安装。Console 程序位于 `~/.local/bin/robonix-hub`，部署、历史和日志数据位于 `~/.local/share/robonix-hub`。
+已有 Robonix 时安装器会直接使用；没有时会在 `~/.local/share/robonix-console/robonix` 下载并安装。当前安装器的 Console 程序位于 `~/.local/bin/robonix-console`，默认数据目录为 `~/.local/share/robonix-console`；设置了 `XDG_DATA_HOME` 时使用其下的 `robonix-console`。旧版 `robonix-hub` 路径由安装器迁移，部署的实际路径以“设置”中显示的值为准。
 
 安装结束会检查页面是否响应，并给出访问地址。机器人驱动和仿真环境仍按 [Hub 整机条目](https://hub.robonix.ai/discover/robot)的 README 准备。
 
@@ -322,7 +328,7 @@ Hub 网站用于查找和阅读；安装操作在机器人自己的 Console 中�
 
 #### 需要程序读取时使用 API
 
-Hub Cloud 提供只读 REST API，地址前缀是 `https://hub.robonix.ai/api/v1`。软件包目录、软件包详情、统计数据和能力约定可以直接读取；账户信息、收藏和机器人信息需要个人访问令牌。
+Hub Cloud 提供只读 REST API，地址前缀是 `https://hub.robonix.ai/api/v1`，具体端点与参数见 [OpenAPI 定义](https://hub.robonix.ai/api/v1/openapi.json)。前缀本身不是网页入口。软件包目录、软件包详情、统计数据和能力约定可以直接读取；账户信息、收藏和机器人信息需要个人访问令牌。
 
 令牌在 Hub 个人主页的“API”区域生成，只显示一次，有效期 90 天，也可以随时吊销。请求时使用 `Authorization: Bearer <token>`；不要把令牌写进公开仓库或分享链接。
 
@@ -460,11 +466,13 @@ Hub Cloud 提供只读 REST API，地址前缀是 `https://hub.robonix.ai/api/v1
 使用 TIAGo Webots 时，在启动 Robonix 前先启动仿真。将 `DEPLOYMENT_DIR` 换成“设置”中显示的部署目录，在机器人主机的终端执行：
 
 ```bash
+export ROBONIX_SOURCE_PATH="$(rbnx path root)"
+test -f "$ROBONIX_SOURCE_PATH/scripts/docker_base_image.sh"
 cd "DEPLOYMENT_DIR"
 bash sim/start.sh
 ```
 
-保持终端运行，等待仿真和传感器就绪。其他仿真按整机 README 操作；完整示例见[运行 TIAGo 仿真](#没有实体机器人运行仿真)。真机完成自己的驱动准备后，直接进入下一步。
+`rbnx path root` 必须返回实际安装对应的源码目录，文件检查需成功；在 Console 的机器人环境变量中填写同一 `ROBONIX_SOURCE_PATH`。保持终端运行，等待仿真和传感器就绪。其他仿真按整机 README 操作；完整示例见[运行 TIAGo 仿真](#没有实体机器人运行仿真)。真机完成自己的驱动准备后，直接进入下一步。
 
 #### 启动 Robonix
 
@@ -554,7 +562,7 @@ Client 会从 Atlas 发现音频桥的地址，无需另填端口。以上端点
 
 #### 安装 Client
 
-需要 Python 3.11 或更高版本。在操作者电脑上操作：
+以下 Client 步骤依据原书的 `739f8499` 编写；需要 Python 3.11 或更高版本。在操作者电脑上操作：
 
 <Tabs groupId="client-platform">
 <TabItem value="linux" label="Linux">
@@ -564,6 +572,7 @@ sudo apt update
 sudo apt install -y libportaudio2 portaudio19-dev python3-venv
 git clone https://github.com/syswonder/robonix-client.git
 cd robonix-client
+git checkout --detach 739f8499
 python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install --upgrade pip
@@ -579,6 +588,7 @@ pip install -e '.[audio]'
 brew install portaudio
 git clone https://github.com/syswonder/robonix-client.git
 cd robonix-client
+git checkout --detach 739f8499
 python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install --upgrade pip
@@ -593,6 +603,7 @@ pip install -e '.[audio]'
 ```powershell
 git clone https://github.com/syswonder/robonix-client.git
 cd robonix-client
+git checkout --detach 739f8499
 py -3 -m venv .venv
 .venv\Scripts\Activate.ps1
 python -m pip install --upgrade pip
@@ -952,7 +963,7 @@ ssh -N -L 50107:127.0.0.1:50107 ROBOT_USER@ROBOT_HOST
 
 一套部署是一个目录，包含部署清单、本机软件包、配置文件和仿真脚本等。每套部署有独立的配置历史，可分别保留仿真、真机或实验配置。
 
-典型目录包括 `robonix_manifest.yaml`、`primitives/`、`services/`、`scripts/`、`config/` 和 `sim/`。新安装的 Console 会创建 `~/.local/share/robonix-hub/deployments/default`，名称为 `Default deployment`；之后的目录也会显示在“设置 → 部署目录”中。
+典型目录包括 `robonix_manifest.yaml`、`primitives/`、`services/`、`scripts/`、`config/` 和 `sim/`。beta.22 初装时使用名为 `Default deployment` 的默认部署。新版本的默认数据根目录已改为 `robonix-console`；不要照抄旧截图中的 `robonix-hub` 路径，以“设置 → 部署目录”的实际名称和路径为准。
 
 #### 确认当前部署
 
@@ -1148,16 +1159,16 @@ curl -fsSL https://hub.robonix.ai/install | bash -s -- --uninstall
 
 卸载会停止并删除管理程序的服务，保留部署、历史和日志。卸载不等于删除机器人配置。
 
-如果需要重新查看许可协议，执行：
+如果需要重新查看当前服务条款和隐私政策，执行：
 
 ```bash
-curl -fsSL https://hub.robonix.ai/install | bash -s -- --show-eula
+curl -fsSL https://hub.robonix.ai/install | bash -s -- --show-terms
 ```
 
-无人值守安装前先阅读 [许可协议](https://hub.robonix.ai/download/EULA.md)，再使用：
+无人值守安装前先阅读 [服务条款](https://hub.robonix.ai/download/TERMS.md)与[隐私政策](https://hub.robonix.ai/download/PRIVACY.md)，再使用：
 
 ```bash
-curl -fsSL https://hub.robonix.ai/install | bash -s -- --accept-eula
+curl -fsSL https://hub.robonix.ai/install | bash -s -- --accept-terms
 ```
 
 只有明确接受协议后才使用无人值守参数。
@@ -1258,7 +1269,7 @@ Console 连不上 Hub 时，可“下载反馈包”另行交给维护者。网�
 
 ### 管理后台
 
-本页面向 Robonix Hub Cloud 管理员。普通账户看不到管理入口。
+以下是 beta.22 使用资料中的 Hub Cloud 管理员操作。普通账户看不到管理入口；后续版本的实际权限和界面以管理端为准。
 
 #### 进入管理后台
 
@@ -1294,7 +1305,7 @@ Console 连不上 Hub 时，可“下载反馈包”另行交给维护者。网�
 | 禁用 / 启用 | 禁止或恢复登录；禁用时已有会话同时失效 |
 | 设为管理员 / 取消管理员 | 调整账户角色，用户需要重新登录 |
 | 设置存储配额 | 为账户设置单独上限；留空使用默认值 |
-| 删除账户 | 永久删除账户及其机器人和版本历史，需要输入邮箱确认 |
+| 删除账户 | 永久删除账户及其上传的机器人和版本历史，无法撤销，需要输入邮箱确认 |
 | 撤销删除 | 取消尚未执行的账户删除申请 |
 
 除“重发邀请”外，账户操作要求管理员在最近 15 分钟内重新登录。管理员不能操作自己的账户，唯一的管理员不能被禁用或取消管理员。
@@ -1355,3 +1366,16 @@ Console 连不上 Hub 时，可“下载反馈包”另行交给维护者。网�
 修改后点“保存”。每次保存都会写入审计日志。
 
 ![站点设置](/img/hub/admin-site-settings.png)
+
+## 版本与资料依据
+
+| 内容 | 依据与边界 |
+|---|---|
+| Console 安装与路径 | 2026-10-28 的[在线安装器](https://hub.robonix.ai/install)及[发布清单](https://hub.robonix.ai/download/RELEASE)，当日 Console 为 `0.1.0-beta.47` |
+| 配置、历史、云端、助手与管理员操作 | 《RobonixHub 内测使用手册》2026-10-03、`0.1.0-beta.22`；保留该版本的操作语义，按钮名称可能不同 |
+| TIAGo 部署 | [整机目录条目](https://hub.robonix.ai/package/robonix.robot.pal_robotics.tiago_webots)及其[源码快照](https://github.com/syswonder/robot-pal_robotics-tiago_webots/tree/dda9f64ceeb9776f5c4091eb5c85e26dcace32c7)；与原书固定源码教程分别检查兼容条件 |
+| Client 安装与交互 | [Client `739f8499`](https://github.com/syswonder/robonix-client/tree/739f84999c5aef120f2ca46641952fb4bee45d93)及原书[图形客户端指南](client.md) |
+| 建图、导航与场景 | 原书[建图](../components/mapping.md)、[导航](../components/navigation.md)、[场景](../components/scene.md)指南，适用版本按各指南声明 |
+| 演示视频 | 2026-10-22 提供的 Ranger MuJoCo 操作录像；用于展示操作，不是 TIAGo 或所有真机的验收记录 |
+
+本页核查的是资料、命令写法与链接；没有据此宣称完成 beta.47 的全部功能、真机运动或云端操作实测。运行时遇到版本差异，先保留软件版本、整机配置版本与日志，再按本页排错流程处理。
