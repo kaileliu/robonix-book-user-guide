@@ -27,7 +27,6 @@ import TabItem from '@theme/TabItem';
 
 **第一次使用，先读所选路线。** 需要每个按钮和设置的完整操作时，跳到本页的[安装、配置与交互详解](#安装配置与交互详解)。运行后继续[建图、导航与场景](#运行之后建图导航与场景)或[日常管理](#日常管理部署历史与云端备份)。所有这些操作都在本页，右侧目录可直接定位。
 
-
 ## 没有实体机器人：运行仿真
 
 这条路线在一台电脑上运行 TIAGo Webots，让你不接触真机也能完成首次配置和相机任务。Console、仿真和 Client 可以装在同一台电脑上。依次完成下面各步；构建完成不等于仿真已经启动。
@@ -56,6 +55,18 @@ curl -fsSL https://hub.robonix.ai/install | bash
 
 ### 安装 TIAGo 配置并构建
 
+安装器完成后，先在仿真电脑终端检查 Robonix 源码路径：
+
+```bash
+export PATH="$HOME/.local/bin:$HOME/.cargo/bin:$PATH"
+export ROBONIX_SOURCE_PATH="$(rbnx path root)"
+test -f "$ROBONIX_SOURCE_PATH/scripts/docker_base_image.sh"
+```
+
+`rbnx path root` 应输出已安装 Robonix 对应的源码目录，文件检查应成功。在 Console“设置 → 机器人环境变量”添加 `ROBONIX_SOURCE_PATH`，值填写上述目录的绝对路径。TIAGo 清单中的部分服务在构建时就要使用此路径，不能等到启动仿真时再设置；检查失败时先修复 Robonix 安装或按整机 README 准备对应源码。
+
+完成路径设置后，在 Console 操作：
+
 1. 在 Console 打开“目录 → 机器人”，搜索 `tiago_webots`。
 2. 对照上面的 Hub 条目确认是 TIAGo Webots，查看说明与 README，再点“安装到这台机器人”并确认。
 3. 下载完成进入“配置”后，核对当前部署，补齐提示缺少的模型等变量；修改参数后“保存为新版本”。
@@ -72,6 +83,7 @@ curl -fsSL https://hub.robonix.ai/install | bash
 在“设置”查看当前部署路径。将 `DEPLOYMENT_DIR` 替换为该目录的绝对路径，在仿真电脑终端执行：
 
 ```bash
+export PATH="$HOME/.local/bin:$HOME/.cargo/bin:$PATH"
 export ROBONIX_SOURCE_PATH="$(rbnx path root)"
 test -f "$ROBONIX_SOURCE_PATH/scripts/docker_base_image.sh"
 cd "DEPLOYMENT_DIR"
@@ -443,6 +455,8 @@ Hub Cloud 提供只读 REST API，地址前缀是 `https://hub.robonix.ai/api/v1
 
 #### 构建所需软件包
 
+构建 TIAGo 前，先按[仿真路线](#安装-tiago-配置并构建)设置 Console 的 `ROBONIX_SOURCE_PATH`，确认它指向已安装版本的源码目录。其他整机同样先补齐 README 要求的构建变量。
+
 打开“更新”，点“更新全部软件包”。Console 会拉取代码并逐个构建；随整机安装的包显示“本地目录”，尚未下载的远程包显示“未下载”。
 
 上方任务日志会显示进度与结果。构建成功后继续；失败时先查看出错的软件包和原因。确认缓存损坏时，点“清理缓存”再重新构建。
@@ -461,6 +475,7 @@ Hub Cloud 提供只读 REST API，地址前缀是 `https://hub.robonix.ai/api/v1
 使用 TIAGo Webots 时，在启动 Robonix 前先启动仿真。将 `DEPLOYMENT_DIR` 换成“设置”中显示的部署目录，在机器人主机的终端执行：
 
 ```bash
+export PATH="$HOME/.local/bin:$HOME/.cargo/bin:$PATH"
 export ROBONIX_SOURCE_PATH="$(rbnx path root)"
 test -f "$ROBONIX_SOURCE_PATH/scripts/docker_base_image.sh"
 cd "DEPLOYMENT_DIR"
@@ -515,7 +530,6 @@ bash sim/start.sh
 
 ![Client：左侧会话，中间对话，右侧当前目标与执行记录](/img/ui/cl-chat-live.webp)
 
-
 #### 准备机器人端
 
 先按 [Hub 机器人目录](https://hub.robonix.ai/discover/robot)中的配置[启动 Robonix](#构建并启动机器人)。在 Console“概览 → 连接 robonix-client”复制机器人地址和 Atlas 端口。
@@ -554,10 +568,9 @@ Client 会从 Atlas 发现音频桥的地址，无需另填端口。以上端点
 
 </details>
 
-
 #### 安装 Client
 
-以下 Client 步骤依据原书的 `739f8499` 编写；需要 Python 3.11 或更高版本。在操作者电脑上操作：
+以下 Client 步骤依据原书的 `739f8499` 编写；需要 Python 3.11 或更高版本。在操作者电脑上操作。Linux / macOS 先用 `python3 --version` 确认版本；若默认版本不足，先准备符合要求的 Python，并将下文的 `python3` 换成该解释器命令，例如 `python3.11`。Windows 用 `py -3 --version` 检查所选版本。
 
 <Tabs groupId="client-platform">
 <TabItem value="linux" label="Linux">
@@ -610,7 +623,6 @@ pip install -e '.[audio]'
 </TabItem>
 </Tabs>
 
-
 #### 启动并连接
 
 保持虚拟环境已激活，将 `ROBOT_HOST` 换成 Console 给出的机器人地址；同机运行可用 `127.0.0.1`：
@@ -624,7 +636,6 @@ robonix-client --robot-host ROBOT_HOST
 `--robot-host` 是机器人地址；`--host` 是 Client 网页的本机监听地址，通常保留默认值。
 
 连接后可先问“目前有哪些能力？”，再按[第一条任务](#连接机器人完成第一条任务)试试相机。
-
 
 #### 使用 Client 的四个页面
 
@@ -685,7 +696,6 @@ Client 启动时会自动启动本机音频服务。按以下顺序检查：
 可修改 **Robot Host**、**Atlas Port**、**Liaison Endpoint**、**User ID** 和 **Voice Record Limit (s)**。点 **Save Settings** 保存；改机器人地址后重新 Connect。
 
 设置存于 `~/.config/robonix-client/settings.yaml`，浏览器也保留一份。User Name 在 Audio 页的 Voiceprint 区域设置。
-
 
 #### 检查连接与交互
 
@@ -787,7 +797,6 @@ Linux / macOS 可用 `nc -vz ROBOT_HOST 50051` 检查默认 Atlas 端口；将�
 
 需要再建一张图时，以建图模式重启服务，使用新的地图 ID 保存；不要把“从定位切回建图”当成继续扩展旧地图的步骤。
 
-
 #### 打开地图界面
 
 在机器人本机打开 [http://127.0.0.1:50107/user](http://127.0.0.1:50107/user)。未保存的实时会话显示 `unsaved live`。没有场景服务时，可使用建图服务的[独立界面](../components/mapping.md)。
@@ -807,20 +816,17 @@ ssh -N -L 50107:127.0.0.1:50107 ROBOT_USER@ROBOT_HOST
 
 </details>
 
-
 #### 走遍要保存的区域
 
 使用这台机器人已经验证的控制方式，低速走过房间和走廊。确认通道安全、急停可用，观察地图与现场是否相符。
 
 原 Webots 教程提供[RViz2 检查方法](quickstart.md#终端-1webotsros-2-与-rviz2)。自动探索需另有 [探索技能](https://hub.robonix.ai/package/robonix.skill.explore)及其建图、导航依赖，不能仅凭建图服务自动完成。
 
-
 #### 保存为新的地图
 
 在 **Map ID** 填写新 ID，例如 `office_3f_v1`，点 **Save current**。成功后状态行显示写入结果和房间数量。
 
 记录这个 ID，后续地图与房间标注用它关联。已保存地图的空间文件不能直接覆盖；重新建图使用新 ID。
-
 
 #### 重新加载并检查定位
 
@@ -869,13 +875,11 @@ ssh -N -L 50107:127.0.0.1:50107 ROBOT_USER@ROBOT_HOST
 
 给地图上的房间命名，再查看相机和场景。开始前需有已保存的地图及可用的场景服务；整机功能可在 [Hub 目录](https://hub.robonix.ai/discover/robot)核对。
 
-
 #### 加载要标注的地图
 
 在机器人本机打开 [http://127.0.0.1:50107/user](http://127.0.0.1:50107/user)，在列表中选择地图并点 **Load**。没有地图时先[创建并保存](#创建并保存室内地图)；远程访问见[地图界面说明](#打开地图界面)。
 
 等待加载完成，确认当前 Map ID 和定位。房间标注只属于这张地图。
-
 
 #### 画出房间并命名
 
@@ -888,13 +892,11 @@ ssh -N -L 50107:127.0.0.1:50107 ROBOT_USER@ROBOT_HOST
 
 房间由人手工标注，感知流水线不会自动产生房间。
 
-
 #### 保存并检查标注
 
 在已加载地图的定位模式下，点 **Save current**。此时只更新房间和对象快照，不覆盖地图本身。重新加载同一地图，检查名称和边界是否保留。
 
 地图重建、坐标原点变化后，房间会标为过期并显示黄色。逐个检查：边界仍正确时点 **Still valid**，错位时重画；系统不会自动删除这些人工标注。
-
 
 #### 查看相机和场景
 
@@ -1018,7 +1020,6 @@ ssh -N -L 50107:127.0.0.1:50107 ROBOT_USER@ROBOT_HOST
 “导出历史”把当前部署的全部配置版本保存为一个文件，可用于备份或迁移。
 
 “导入历史”会用文件替换当前部署已有的历史。导入前先核对部署，并导出当前历史留底。要从账户云端恢复，使用[云端备份](#备份恢复与分享配置)。
-
 
 下一步：需要分别保留不同实验配置时，[新建或切换部署](#管理多套部署)；需要异地保存时，[上传云端副本](#上传当前部署)。
 
@@ -1152,7 +1153,7 @@ Console 在启动时和此后每 6 小时检查更新。自动更新会下载、
 curl -fsSL https://hub.robonix.ai/install | bash -s -- --uninstall
 ```
 
-卸载会停止并删除管理程序的服务，保留部署、历史和日志。卸载不等于删除机器人配置。
+卸载会停止并删除管理程序的服务，也会停止它管理的 Robonix 运行与后台任务服务；部署、历史和日志保留。先结束任务并停止机器人，再执行卸载。
 
 如果需要重新查看当前服务条款和隐私政策，执行：
 
