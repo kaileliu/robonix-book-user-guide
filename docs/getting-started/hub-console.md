@@ -14,7 +14,7 @@ import TabItem from '@theme/TabItem';
 
 | 你的条件 | 使用路线 | 完成后应该看到什么 |
 |---|---|---|
-| 没有实体机器人 | [没有实体机器人：运行仿真](#没有实体机器人运行仿真) | MuJoCo 中出现 Ranger 与 Piper，Console 显示运行中，Client 能观察相机并提交探索任务 |
+| 没有实体机器人 | [没有实体机器人：运行仿真](#没有实体机器人运行仿真) | MuJoCo 中出现 Ranger 仿真场景，Console 显示运行中，Client 能连接并发送任务 |
 | 有实体机器人 | [有实体机器人：安装并使用](#有实体机器人安装并使用) | 适配的本体和服务正常运行，Client 在线，任务结果与现场一致 |
 
 两条路线的区别在于**机器人从哪里来，以及启动前准备什么**：仿真路线在电脑中启动虚拟本体；真机路线先检查型号适配、驱动和设备。两者都通过 Hub 选择配置、Console 管理运行、Client 下达任务。
@@ -29,16 +29,16 @@ import TabItem from '@theme/TabItem';
 
 ## 没有实体机器人：运行仿真
 
-这条路线使用**松灵 Ranger Mini V3 移动机器人仿真**，带 Piper 机械臂，在 MuJoCo 中运行。Console、仿真和 Client 可以安装在同一台电脑上。按顺序完成后，你应能看到仿真房间和机器人，通过 Client 观察前置相机画面，并提交一次探索任务。
+这条路线使用**松灵 Ranger Mini V3 移动机器人仿真**，带 Piper 机械臂，在 MuJoCo 中运行。Console、仿真和 Client 可以安装在同一台电脑上。按顺序完成后，你应能看到仿真房间和机器人，通过 Client 连接这套仿真部署并发送文本任务。
 
 ### 准备运行仿真的电脑
 
-本节使用 [Ranger Mini V3 MuJoCo 整机配置](https://hub.robonix.ai/package/robonix.robot.agilex.ranger_with_piper_mujoco)的默认 **Web 后端**。软件包 README 的端到端测试环境是 **Ubuntu 22.04、x86_64、ROS 2 Humble 和 Docker**；这不是任意操作系统或硬件的兼容保证。准备以下条件：
+本节使用 [Ranger Mini V3 MuJoCo 整机配置](https://hub.robonix.ai/package/robonix.robot.agilex.ranger_with_piper_mujoco)的 **native 后端**。软件包 README 的端到端测试环境是 **Ubuntu 22.04、x86_64、ROS 2 Humble 和 Docker**；这不是任意操作系统或硬件的兼容保证。准备以下条件：
 
 - Docker Engine 与 Compose 插件，当前用户能够直接运行 Docker。
 - Node.js 20 或更高版本、npm、Python 3、Git 和 curl。
-- 可用的桌面图形会话与 WebGL 2；首次体验使用带图形加速的桌面，软件渲染可能很慢。
-- 可访问 GitHub、npm、容器镜像源和 Playwright 浏览器下载服务的网络。
+- 可用的 X11 / WSLg 桌面会话与硬件 OpenGL；native 窗口及相机渲染需要 GPU 支持，软件渲染不属于这条启动路线。
+- 可访问 GitHub、npm 和容器镜像源的网络，构建期间保持连接畅通。
 - 可用的 Hub 账户，以及支持图像理解和工具调用的模型服务地址、密钥、模型名。
 
 先在终端检查：
@@ -59,7 +59,7 @@ docker compose version
 
 ### 在仿真电脑安装 Console
 
-1. 准备 Hub 账户。收到邀请邮件时，打开激活链接、输入验证码，完成页面要求的协议确认并设置密码；已有账户可直接使用。在浏览器打开 [Hub](https://hub.robonix.ai/discover)，确认能登录。开启两步验证时准备验证码。
+1. [准备 Hub 账户](https://hub.robonix.ai/auth/login?flow=f30d0183-c9b3-48db-8ee5-f5d0616abb10)。打开账户页面后，没有账户时点底部“注册”，按页面提示完成注册与协议确认；已有账户可直接登录。收到邀请时也可使用邀请链接完成激活。开启两步验证时准备验证码。
 2. 在仿真电脑终端，以平时使用电脑的普通用户执行：
 
    ```bash
@@ -82,21 +82,16 @@ docker compose version
    | VLM 模型 | `VLM_MODEL` | 支持图像理解和工具调用的模型名 |
 
    安装时跳过了这些字段，或需要修改时，打开 Console“设置 → 机器人环境变量”，添加这三项并保存。本机已有值时，安装器会询问是否保留，核对后选择。
+
+![Console 设置页中的模型地址、密钥和模型名](/img/hub/ranger-model-settings.png)
+
+*在“设置 → 机器人环境变量”填写①中的三项，模型地址与模型名以你使用的服务为准。*
+
 5. 安装结束后，在同一台电脑浏览器打开 [http://127.0.0.1:4880](http://127.0.0.1:4880)。填写 Hub 邮箱和密码，点“登录”；有两步验证时继续输入验证码。若提示尚未同意协议，先在 Hub 完成确认，再返回登录。
 
-![Console 登录页中的邮箱、密码和登录按钮](/img/hub/console-login.png)
+![Hub 账户页面中的邮箱密码登录与注册入口](/img/hub/hub-account-login-register.png)
 
-*登录后应能进入概览、配置等本机管理页面。*
-
-6. 回到终端检查 Robonix：
-
-   ```bash
-   export PATH="$HOME/.local/bin:$HOME/.cargo/bin:$PATH"
-   rbnx --version
-   rbnx path root
-   ```
-
-   版本命令应正常退出，源码路径应指向实际存在的 Robonix 仓库。若找不到 `rbnx` 或源码，先查看安装器记录的错误并修复安装，再安装整机配置。
+*图为 Hub 账户登录与注册入口；Console 使用同一 Hub 账户。完成本机 Console 登录后，应能进入概览和配置页面。*
 
 ### 安装 Ranger 配置并完成构建
 
@@ -107,131 +102,74 @@ docker compose version
 
 *确认“仿真”和 MuJoCo 标记，点①处安装按钮。图片中的安装次数会变化。*
 
-3. 等待下载完成并进入“配置”。当前部署为空时安装到其中；已有内容时会新建部署，随后核对当前部署的名称。应能看到 `ranger_chassis`、`front_camera`、`wrist_camera`、`piper_ctl`、`mapping`、`nav2`、`explore` 和 `pick` 等条目。
-4. 在“设置”的部署列表中找到这套部署，复制其**绝对路径**。下文的 `DEPLOYMENT_DIR` 都替换成这个路径。在终端进入该目录：
-
-   ```bash
-   cd "DEPLOYMENT_DIR"
-   test -f robonix_manifest.yaml
-   test -f scripts/bootstrap.sh
-   test -f sim/start.sh
-   ```
-
-   三个文件检查均应成功；失败说明目录或下载内容不对，先核对安装结果，不要在其他仓库目录运行后面的脚本。
-5. 在同一终端检查 Robonix API 路径：
+3. 安装配置后，在仿真电脑终端确认 Robonix 已正确安装：
 
    ```bash
    export PATH="$HOME/.local/bin:$HOME/.cargo/bin:$PATH"
-   rbnx path robonix-api
+   rbnx --version
+   rbnx path root
    ```
 
-   软件包会自动发现 API。若发现失败，在部署目录的 `.env` 中显式配置 `ROBONIX_SOURCE_PATH` 为实际 Robonix 源码绝对路径，或配置 `ROBONIX_API_PATH` 为其中 `pylib/robonix-api` 的绝对路径；两者按 README 的发现规则选择，不要填写其他版本的源码。
-6. 准备脚本使用的本机 `.env`。文件尚不存在时先复制模板；已有文件时直接编辑，不要覆盖自己的设置：
+   `rbnx --version` 显示当前运行的 Robonix 命令行程序版本，用来确认 `rbnx` 可执行；`rbnx path root` 显示登记的 Robonix 源码根目录，整机脚本会据此查找所需源码和 API。两条命令都应正常退出，返回的目录应实际存在。它们检查的是 Robonix 安装，不代表整机软件包已经构建完成。找不到命令或源码时，先处理安装报错，再继续。
+4. 回到 Console，打开左侧①“更新”，点击②“更新全部软件包”。保持网络畅通，等待软件下载和构建完成。首次可预留**约 40 分钟**，实际耗时取决于网络、硬件和已有缓存。
+
+![Console 更新页中的 Ranger 软件包列表和更新全部软件包按钮](/img/hub/ranger-update-packages.png)
+
+*①进入更新页，②开始更新全部软件包。*
+
+   成功时，任务显示“已完成”，构建汇总中的失败数为 `0`。核对本次任务的日志，不要只看按钮已恢复可点击；有失败时先处理日志中第一个报错。
+
+![Ranger 软件包更新任务已完成，构建汇总显示失败数为零](/img/hub/ranger-build-complete.png)
+
+*图中本次任务为“已完成”，汇总为 `Failed: 0`；软件包数量会随配置变化。*
+
+5. **手动启动 MuJoCo 仿真。** 这一步仅仿真需要：Robonix 不负责管理仿真进程的生命周期，构建完成后仍需单独启动仿真。
+
+   在 Console“设置”的部署列表中查看当前部署的路径。部署目录是放置 `robonix_manifest.yaml`、`primitives/`、`sim/` 等文件的目录；列表若显示清单文件路径，取其所在文件夹。默认部署通常位于 Console 数据目录下的 `deployments/default`，即 `~/.local/share/robonix-console/deployments/default`；设置了其他数据目录或新建部署时，以页面实际路径为准。
+
+   将 `DEPLOYMENT_DIR` 替换为上述部署目录的绝对路径，在仿真电脑终端执行：
 
    ```bash
-   test -f .env || cp .env.example .env
+   cd "DEPLOYMENT_DIR"
+   bash sim/start.sh --backend native
    ```
 
-   用文本编辑器打开 `.env`，取消对应行的注释，填写与 Console 相同的模型地址、密钥和模型名。以下大写占位符必须替换为你自己的实际值：
+   本节使用 native 后端，需要可用的 X11 / WSLg 图形会话和硬件 OpenGL。保持终端打开，等待 MuJoCo 窗口显示场景；下面是 `scenesmith_house_187` 场景的启动画面。
 
-   ```dotenv
-   VLM_BASE_URL=MODEL_API_BASE_URL
-   VLM_API_KEY=MODEL_API_KEY
-   VLM_MODEL=VISION_MODEL_NAME
-   SIM_BACKEND=web
-   MUJOCO_RMW_IMPLEMENTATION=rmw_fastrtps_cpp
-   ```
+![MuJoCo native 窗口显示 Ranger 仿真房间中的沙发与茶几](/img/hub/ranger-native-viewer.png)
 
-   `.env` 供初始化和仿真脚本读取，Console 中的模型变量供它启动的系统读取；两处保持一致。本机文件不提交 Git，也不作为分享附件。桥接容器默认使用 Fast DDS，保留这里的 `rmw_fastrtps_cpp`，不要套用 Webots 的 Zenoh 设置。
-7. 在部署根目录执行初始化构建：
+*仿真窗口已出现。此时只启动了仿真，下一步才启动 Robonix。*
 
-   ```bash
-   bash scripts/bootstrap.sh
-   ```
+6. 切换回 Console“概览”，核对当前是刚安装的 Ranger 仿真部署，点“启动”，等待运行状态更新。
 
-   脚本会按锁文件安装前端依赖、下载 Playwright Chromium、构建 ROS 2 桥接镜像、验证六个本机原语和 Pick 技能，并执行部署的 `rbnx build`。等待脚本以状态码 0 结束，末尾提示构建完成。只点 Console“更新全部软件包”不能代替首次初始化中的前端和浏览器准备。
-8. 回到 Console“配置”，检查缺少的变量和参数；有修改时点“保存为新版本”，填写说明，检查差异后保存。在“设置 → 环境脚本”中登记本部署 `scripts/env.sh` 的**绝对路径**，使 Console 构建和运行前加载与该整机一致的环境。模型变量仍保持为上面填写的值。
-9. 在 Console“更新”点“更新全部软件包”，等待任务成功。失败时记录第一个失败的软件包和错误；终端初始化失败则查看终端输出。解决错误并重新构建成功后，再启动仿真。
+![Console 概览页中启动 Ranger 仿真部署的按钮](/img/hub/ranger-console-start.png)
 
-### 先启动 MuJoCo，再启动 Robonix
+*先确认当前部署，再点“启动”。连接 Client 时使用本机显示的地址和端口。*
 
-在仿真电脑终端进入刚才的部署目录，启动默认 Web 后端：
+7. 在左侧①“日志”中选择②本次运行记录，查看 `rbnx 输出` 和各组件日志，确认启动过程与原语注册情况。出现失败或长期停留在等待注册时，先查看对应组件日志，确认仿真已启动。
 
-```bash
-export PATH="$HOME/.local/bin:$HOME/.cargo/bin:$PATH"
-cd "DEPLOYMENT_DIR"
-bash sim/start.sh
-```
+![Console 日志页显示 Ranger 本次运行及原语注册日志](/img/hub/ranger-console-startup-log.png)
 
-保留这个终端，等待脚本报告就绪。默认场景为 `scenesmith_house_187`，浏览器界面地址为 [http://127.0.0.1:5180/?environment=scenesmith_house_187](http://127.0.0.1:5180/?environment=scenesmith_house_187)。应看到房间和 Ranger 机器人，而不是只有空白画面。
-
-在另一个终端检查桥接服务：
-
-```bash
-curl -fsS http://127.0.0.1:8766/health
-```
-
-应返回健康状态 JSON；结合启动终端的就绪提示和实际画面检查。失败时查看部署目录下 `.runtime/bridge.log` 和 `.runtime/browser.log`，不要先启动机器人任务。
-
-回到 Console“概览”，核对当前是 Ranger 仿真部署，点“启动”，等待状态变为“运行中”。启动失败时打开本次运行日志，检查模型变量、环境脚本及仿真桥接状态。构建成功、桥接响应和 Robonix 运行中分别对应不同阶段，三项都要确认。
-
-在另一个终端验证能力注册：
-
-```bash
-cd "DEPLOYMENT_DIR"
-source scripts/env.sh
-rbnx caps -v
-```
-
-六个原语以及建图、导航、场景等提供方应正常注册。Explore、Pick 按需调用，初始显示 `INACTIVE` 不一定是错误；先检查传感器和基础服务是否就绪。
+*①进入日志页，②选择本次运行；“运行中”还需结合后续组件日志确认，不能只看启动按钮。*
 
 ### 安装 Client 并连接仿真机器人
 
-首次体验可以把 Client 装在同一台 Ubuntu 电脑上。先确认 Python 解释器不低于 **3.11**；系统默认 `python3` 不足时，先安装符合要求的解释器，将下文 `python3.11` 换成它的命令。
-
-在用于保存 Client 源码的目录打开新终端，执行：
+[Robonix Client](https://github.com/syswonder/robonix-client) 提供机器人对话界面。先准备 Python **3.11 或更高版本**，在操作者电脑用于保存源码的目录打开终端；下面以 Linux / macOS 为例：
 
 ```bash
-sudo apt update
-sudo apt install -y libportaudio2 portaudio19-dev
-python3.11 --version
 git clone https://github.com/syswonder/robonix-client.git
 cd robonix-client
-git checkout --detach 739f8499
-python3.11 -m venv .venv
+python3 -m venv .venv
 source .venv/bin/activate
-python -m pip install --upgrade pip
-pip install -e '.[audio]'
+pip install -e .
 robonix-client --robot-host 127.0.0.1
 ```
 
-创建虚拟环境提示缺少 `venv` 时，先安装该解释器对应的 venv 包，例如 `python3.11-venv`，再重试。Client 的音频依赖不代表 Ranger 整机带有语音能力：当前 Ranger 仿真包未配置音频，本路线使用文本交互。
+`python3` 应指向符合版本要求的解释器。Windows 安装与可选音频依赖按仓库 README 操作；Ranger 当前仿真包未配置音频，本路线先用文本交互。
 
-打开 [http://127.0.0.1:7860](http://127.0.0.1:7860)，填写 **Robot Host** 为 `127.0.0.1`，**Atlas Port** 使用 Console 概览给出的实际值（默认 `50051`），**Liaison Endpoint** 留空，点 **Connect**，等待在线。
+打开 [http://127.0.0.1:7860](http://127.0.0.1:7860)，将 **Robot Host** 填为 Robonix 所在电脑的地址，同机运行使用 `127.0.0.1`；**Atlas Port** 填 Console 概览显示的端口，**Liaison Endpoint** 通常留空，点 **Connect** 等待在线。然后在 Chat 中输入一条简单文本任务并发送，查看响应。
 
-Client 在另一台电脑时，用机器人实际地址。在 Console 概览按提示“允许其他机器连接”并确认，重启 Robonix 后生效；还要确保 Atlas 和发现的组件都能从该电脑访问。Console 的管理页面隧道不能代替这些组件连接，只在可信网络中开放。
-
-### 观察相机并提交探索任务
-
-1. 先发送“目前有哪些能力？”，等待机器人回复，核对它识别的是 Ranger Mini V3 和 Piper 仿真本体。
-2. 再发送“用前置相机拍一张照片，告诉我看到了什么”，等待最终回复，并对照 MuJoCo 画面检查；相机提供方是 `front_camera`。
-3. 确认传感器、建图和导航正常后，发送“请自由探索当前房间，最多 300 秒，速度不超过 0.18 米/秒，并返回任务 ID”。保留返回的 `run_id`，随后请求“查询这个探索任务的状态”，携带同一个 ID，不要重复发起多个探索任务。
-
-![Client 接收 Ranger 探索请求、说明执行步骤并调用探索能力](/img/hub/ranger-client-explore.png)
-
-*①是已加入运行中任务的请求，②③是机器人的响应；截图底部显示正在调用 Explore。它说明任务开始处理，不能仅凭这张图认定探索已完成。*
-
-在仿真画面中检查机器人是否移动、是否避开障碍，结合任务进度、最终状态和日志确认结果。探索状态为 `SUCCEEDED`、`FAILED`、`CANCELED` 或 `TIMEOUT` 时才表示该次探索结束。探索过程中不要同时发送手动底盘、其他导航或抓取命令；要改做别的任务，先请求“取消探索任务”，携带同一个 `run_id`，确认调用探索取消能力并查询到结束状态，检查机器人停止。当前包的抓放能力只针对环境中登记的可交互动态物体，不代表任意家具都能抓取。
-
-### 结束仿真
-
-探索仍在运行时，先用同一个 `run_id` 请求取消探索并查询其结束状态；`ABORT ALL TASKS` 用于取消 Client 当前执行任务，不能仅凭这个按钮推断异步探索已停止。确认仿真机器人停止后，在 Console“概览”点“停止”。保持配置和日志需要时先保存，随后在仿真终端按 `Ctrl+C`；也可以在部署根目录执行：
-
-```bash
-bash sim/stop.sh
-```
-
-Robonix 与仿真是独立的运行过程：停止仿真脚本不会自动停止 Robonix，停止 Console 中的 Robonix 也不会自动关闭仿真。
+Client 在另一台电脑时，按 Console 的提示允许其他机器连接，保存并重启 Robonix，确保 Atlas 和发现的组件可达。更多平台安装与连接说明见 [Client README](https://github.com/syswonder/robonix-client#install-guide)。
 
 ### 观看安装与仿真部署演示
 
@@ -551,7 +489,7 @@ Hub Cloud 提供只读 REST API，地址前缀是 `https://hub.robonix.ai/api/v1
 
 #### 构建所需软件包
 
-Ranger 仿真首次使用时，先在部署根目录执行 `bash scripts/bootstrap.sh`，准备前端、Playwright 浏览器及桥接镜像；完成本机 `.env` 和 Console 环境脚本设置后，再使用“更新”页。其他整机按自己的 README 补齐构建变量与外部依赖。
+Ranger 仿真在 Console“更新”页更新全部软件包；按整机 README 核对其外部依赖。其他整机同样先补齐所需构建变量与运行环境。
 
 打开“更新”，点“更新全部软件包”。Console 会拉取代码并逐个构建；随整机安装的包显示“本地目录”，尚未下载的远程包显示“未下载”。
 
@@ -568,7 +506,7 @@ Ranger 仿真首次使用时，先在部署根目录执行 `bash scripts/bootstr
 
 #### 仿真先启动环境
 
-Ranger Mini V3 MuJoCo 使用独立仿真进程。先完成初始化，在部署根目录执行 `bash sim/start.sh`，等待默认 Web 界面 `http://127.0.0.1:5180/?environment=scenesmith_house_187` 与桥接服务 `http://127.0.0.1:8766/health` 就绪，再启动 Robonix。配置和完整流程见[仿真路线](#没有实体机器人运行仿真)。
+Ranger Mini V3 MuJoCo 使用独立仿真进程。软件包构建成功后，在部署根目录执行 `bash sim/start.sh --backend native`，等待 MuJoCo 图形窗口与桥接服务就绪，再在 Console 启动 Robonix。Robonix 不管理仿真的生命周期，详细步骤见[仿真路线](#没有实体机器人运行仿真)。
 
 其他仿真按各自整机 README 操作，不混用环境变量和启动脚本。真机完成自己的驱动准备后，进入下一步。
 
@@ -833,7 +771,7 @@ Linux / macOS 可用 `nc -vz ROBOT_HOST 50051` 检查默认 Atlas 端口；将�
 
 Ranger 使用 `front_camera`；换用其他机器人时，使用它实际安装的相机。也可以问“你能看到什么？”。相机和相关软件可在 [Hub 目录](https://hub.robonix.ai/discover)查看。
 
-发送任务后等待最终回复，再对照现场或仿真画面检查结果。Ranger 的探索交互示例见[仿真路线](#观察相机并提交探索任务)。
+发送任务后等待最终回复，再对照现场或仿真画面检查结果。
 
 #### 检查任务结果
 
@@ -906,7 +844,7 @@ ssh -N -L 50107:127.0.0.1:50107 ROBOT_USER@ROBOT_HOST
 
 使用这台机器人已经验证的控制方式，低速走过房间和走廊。确认通道安全、急停可用，观察地图与现场是否相符。
 
-Ranger 可以按本页的[探索步骤](#观察相机并提交探索任务)建图。自动探索需要 [探索技能](https://hub.robonix.ai/package/robonix.skill.explore)及建图、导航依赖，不能仅凭建图服务自动完成；探索过程中不要叠加手动底盘、其他导航或抓取命令。
+Ranger 的整机 README 提供[探索任务用法](https://github.com/syswonder/robot-agilex-ranger_with_piper_mujoco#terminal-3-chat)，启动探索前先检查整机所需能力。自动探索需要 [探索技能](https://hub.robonix.ai/package/robonix.skill.explore)及建图、导航依赖，不能仅凭建图服务自动完成；探索过程中不要叠加手动底盘、其他导航或抓取命令。
 
 #### 保存为新的地图
 
