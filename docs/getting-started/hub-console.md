@@ -272,8 +272,8 @@ ssh -N -L 4881:127.0.0.1:4880 ROBOT_USER@ROBOT_HOST
 在 Console“目录 → 机器人”找到“云深处 Lite3 四足机器人”，核对包名 **`robonix.robot.deep_robotics.lite3`**，点“安装到这台机器人”，新建或选择对应部署。
 
 <figure>
-  <img src={useBaseUrl('/img/hub/lite3-install.png')} alt="Console 中的云深处 Lite3 整机配置与安装按钮" width="856" height="730" loading="lazy" />
-  <figcaption>选择 Lite3 整机配置，点击“安装到这台机器人”。</figcaption>
+  <img src={useBaseUrl('/img/hub/lite3-step-install.webp')} alt="Lite3 配置安装入口，红框1标出安装按钮" width="775" height="785" loading="lazy" />
+  <figcaption>点击①“安装到这台机器人”，核对目标部署。</figcaption>
 </figure>
 
 安装完成后，在 Console“设置”中查看并记录本次部署目录。后文用 `DEPLOYMENT_DIR` 表示该目录的绝对路径；执行命令时，将它替换为本机 Lite3 部署的实际路径。不要将 `rbnx path root` 输出的 Robonix 源码根目录当成部署目录。
@@ -283,15 +283,22 @@ ssh -N -L 4881:127.0.0.1:4880 ROBOT_USER@ROBOT_HOST
 打开“配置”，展开 `mapping`。没有已有地图时，将 `map_mode` 从 `localization` 改为 `mapping`，点“保存为新版本”，填写说明并确认差异。
 
 <figure>
-  <img src={useBaseUrl('/img/hub/lite3-video-mapping.webp')} alt="Lite3 的 mapping 配置中将 map_mode 改为 mapping" width="1340" height="900" loading="lazy" />
-  <figcaption>首次运行切换到建图模式，再保存为新版本。</figcaption>
+  <img src={useBaseUrl('/img/hub/lite3-step-mapping.webp')} alt="建图模式与保存按钮，依次标注1和2" width="1340" height="900" loading="lazy" />
+  <figcaption>将①处的 map_mode 设为 mapping，再点②保存为新版本。</figcaption>
 </figure>
 
 `3f_full_lite3` 是示例地图 ID。新机器不能假定已经拥有这张地图；先建图并[保存自己的地图](#创建并保存室内地图)，之后再配置自己的定位地图 ID。
 
 #### 核对运动主机与雷达地址
 
-展开 `lite3_quadruped`，检查 `target_ip` 是否指向实际运动主机；再展开 `mid360_lidar`，检查：
+展开 `lite3_quadruped`，检查 `target_ip` 是否指向实际运动主机，并核对 `target_port`、`local_port`。
+
+<figure>
+  <img src={useBaseUrl('/img/hub/lite3-step-target.webp')} alt="Lite3 运动主机地址与端口设置，红框1标出核对区域" width="1320" height="780" loading="lazy" />
+  <figcaption>核对①中的运动主机地址与目标端口；本示例分别为 192.168.1.120、43893。</figcaption>
+</figure>
+
+再展开 `mid360_lidar`，检查：
 
 | 字段 | 填写内容 |
 |---|---|
@@ -299,8 +306,8 @@ ssh -N -L 4881:127.0.0.1:4880 ROBOT_USER@ROBOT_HOST
 | `host_ip` | 机器人主机连接雷达的网卡地址；需与后面的网卡设置一致 |
 
 <figure>
-  <img src={useBaseUrl('/img/hub/lite3-video-lidar.webp')} alt="Lite3 雷达配置中的 host_ip 与 lidar_ip" width="1340" height="965" loading="lazy" />
-  <figcaption>核对主机网卡与雷达地址，填写本机实际值。</figcaption>
+  <img src={useBaseUrl('/img/hub/lite3-step-lidar.webp')} alt="雷达地址修改差异及保存按钮，依次标注1和2" width="900" height="400" loading="lazy" />
+  <figcaption>核对①中的雷达与主机地址，再点②保存为新版本。</figcaption>
 </figure>
 
 填写实际设备地址，确保 `host_ip` 与后续设置的主机网卡地址一致。修改完成后保存新版本；同时核对相机型号、传感器安装外参和 Lite3 自己的导航参数。
@@ -377,6 +384,40 @@ sudo usermod -aG docker ROBOT_USER
 
 完成后重新建立 SSH 会话或重启主机，使组成员关系生效。
 
+#### 配置运动主机的数据回传
+
+机器人计算主机运行 Robonix，运动主机负责本体控制，两者的地址和端口需要对应。首次接入时，在操作者电脑连接机器人提供的 Wi-Fi（本示例的名称以 `YSC` 开头），使用设备提供的凭据登录运动主机。将 `MOTION_USER` 和 `MOTION_HOST` 替换为实际用户名与地址：
+
+```bash
+ssh MOTION_USER@MOTION_HOST
+cd ~/jy_exe/conf
+vim network.toml
+```
+
+以下配置对应计算主机 `192.168.1.50`、Robonix 接收端口 `43897` 和运动主机控制端口 `43893`：
+
+```toml
+ip = '192.168.1.50'
+target_port = 43897
+local_port = 43893
+```
+
+这里的 `ip` 指向**机器人计算主机**；`target_port` 对应 Console 中 `lite3_quadruped.local_port`，`local_port` 对应其 `target_port`。按实际网络填写，保留文件中其他必要设置。此路径与重启脚本适用于本示例的运动主机软件，其他版本按设备说明核对。
+
+<figure>
+  <img src={useBaseUrl('/img/hub/lite3-step-motion-network.webp')} alt="运动主机 network.toml 的数据回传地址与端口，红框1标出配置" width="965" height="210" loading="lazy" />
+  <figcaption>在①处核对回传地址和两端端口。</figcaption>
+</figure>
+
+在 Vim 中按 `i` 编辑，完成后按 Esc，输入 `:wq` 保存并退出。在**运动主机**执行以下命令使配置生效：
+
+```bash
+cd ~/jy_exe/scripts
+./restart.sh
+```
+
+完成后回到**机器人计算主机**的终端，继续设置网卡。
+
 #### 设置机器人主机网卡
 
 先列出连接，确定连向机器人和雷达的有线连接与接口：
@@ -440,8 +481,8 @@ ROBONIX_RMW_IMPLEMENTATION=rmw_zenoh_cpp
 保持网络畅通，等待构建结束。检查汇总中的 `Failed: 0`；有失败时保留日志并先处理第一个报错。
 
 <figure>
-  <img src={useBaseUrl('/img/hub/lite3-video-build.webp')} alt="Lite3 构建汇总显示 Built 12 与 Failed 0" width="1965" height="480" loading="lazy" />
-  <figcaption>构建完成后，检查汇总中的 Failed 为 0。</figcaption>
+  <img src={useBaseUrl('/img/hub/lite3-step-build.webp')} alt="构建汇总中红框1标注失败数" width="1965" height="480" loading="lazy" />
+  <figcaption>检查①中的 Failed 为 0。</figcaption>
 </figure>
 
 ### 启动 Lite3 并检查能力
@@ -463,8 +504,8 @@ rbnx caps
 检查底盘、雷达、相机及所需服务是否已注册。出现 `namespace mismatch` 时，核对能力命名空间与部署配置；有异常的组件需先排查。结合 `rbnx-boot/logs/` 中的组件日志确认状态。能力条目存在不等于现场动作已经完成。
 
 <figure>
-  <img src={useBaseUrl('/img/hub/lite3-video-caps.webp')} alt="rbnx caps 显示 Lite3 组件的能力与注册状态" width="1355" height="280" loading="lazy" />
-  <figcaption>检查各组件的能力与状态，并处理异常提示。</figcaption>
+  <img src={useBaseUrl('/img/hub/lite3-step-startup.webp')} alt="启动输出的系统和硬件状态，依次标注1和2" width="1185" height="450" loading="lazy" />
+  <figcaption>检查①系统组件与②硬件组件的启动状态，再查询能力列表。</figcaption>
 </figure>
 
 接着在终端启动交互：
@@ -472,6 +513,11 @@ rbnx caps
 ```bash
 rbnx chat
 ```
+
+<figure>
+  <img src={useBaseUrl('/img/hub/lite3-step-chat.webp')} alt="终端交互中的站立与坐下请求，红框1标出交互记录" width="1945" height="470" loading="lazy" />
+  <figcaption>在①处询问能力并发送姿态请求，检查执行结果。</figcaption>
+</figure>
 
 先询问当前能力，再进行已验证的操作。结束部署时，在同一部署目录的另一终端执行 `./stop.sh`；该脚本会清理本部署进程并检查反馈端口。
 
@@ -493,17 +539,34 @@ robonix-client --robot-host ROBOT_HOST
 打开 [http://127.0.0.1:7860](http://127.0.0.1:7860)，核对 **Robot Host**，**Atlas Port** 默认 `50051`，**Liaison Endpoint** 留空，点 **Connect**。Atlas、Executor 和 Liaison 的端口需可达，当前清单默认分别为 `50051`、`50061` 和 `50081`，仅在可信局域网或 Tailscale 网络使用。
 
 <figure>
-  <img src={useBaseUrl('/img/hub/lite3-video-client.webp')} alt="Robonix Client 中 Lite3 的站立和坐下请求及执行记录" width="2568" height="1015" loading="lazy" />
-  <figcaption>Client 连接后发送姿态请求，查看执行记录并确认本体状态。</figcaption>
+  <img src={useBaseUrl('/img/hub/lite3-step-client.webp')} alt="Client 连接状态、控制请求与执行记录，依次标注1至3" width="2563" height="1015" loading="lazy" />
+  <figcaption>先确认①已连接，再发送②姿态请求，检查③执行记录。</figcaption>
 </figure>
 
 连接成功后，先询问当前可用能力。进行姿态测试前，确保现场安全、急停可用，再发送“站立”“坐下”等请求；检查执行记录，并对照本体姿态确认结果。这份 Lite3 配置没有机械臂和夹爪，不提供抓取、搬运等操作。
 
 需要语音时，按 Client 说明补装 `audio` 依赖和系统音频库，核对腾讯凭据，在 **Audio** 将输入、输出提供方选为 `audio_client_bridge`。桥接端口为 `60002`；先确认文本交互正常，再检查音频链路。
 
+### 验证本体控制是否成功
+
+确认测试区域空旷、急停可用，按顺序完成一次姿态控制：
+
+1. 在 Client 的 **Chat** 中发送“站起来”，检查执行记录，并观察本体是否抬起机身、四足支撑站稳。
+2. 本体稳定后发送“趴下”，检查执行记录，并观察本体是否降低机身、回到趴卧姿态。也可发送“坐下”；本示例的 `sit` 对应趴下动作。
+3. 确认请求、执行记录与实际姿态一致，且没有持续报错，表示本次连接与姿态控制验证通过。仅有聊天回复或请求派发记录时，还需观察本体确认。
+
+下面的控制演示展示 Lite3 本体由趴卧到站立，再回到趴卧的实际姿态变化。这项验证覆盖本体连接与姿态控制；建图、定位和导航按后文分别验证。
+
+<video controls preload="none" poster={useBaseUrl('/img/hub/lite3-control-poster.webp')} style={{width: '100%'}} aria-label="Lite3 本体站立与趴下控制成功演示">
+  <source src={useBaseUrl('/video/lite3-control-demo.mp4')} type="video/mp4" />
+  浏览器不支持视频播放时，可下载视频后观看。
+</video>
+
+[下载本体控制演示](/video/lite3-control-demo.mp4)
+
 ### 观看本体安装与交互演示
 
-下面的视频展示 Lite3 的安装配置、硬件准备、构建启动与 Client 交互。操作时使用本机部署目录、设备地址和服务凭据。
+下面的视频展示 Lite3 的安装配置、运动主机与计算主机网络设置、构建启动、Client 交互和本体控制。操作时使用本机部署目录、设备地址和服务凭据。
 
 <video controls preload="none" style={{width: '100%'}} aria-label="云深处 Lite3 的安装配置与交互演示">
   <source src={useBaseUrl('/video/lite3-setup-demo.mp4')} type="video/mp4" />
@@ -735,6 +798,7 @@ curl -fsSL https://hub.robonix.ai/install | bash -s -- --uninstall
 | Ranger 更新软件包失败 | 网络、Docker 权限和“更新”页任务日志中的第一个报错 |
 | MuJoCo 窗口不出现 | 是否在正确部署目录运行脚本，X11 / WSLg 与硬件 OpenGL 是否可用 |
 | Lite3 构建或启动失败 | ROS 2 Humble、Zenoh 依赖与配置、CLIP 权重、相机 udev 规则、`.env`、设备地址及反馈端口占用 |
+| Lite3 能连接但姿态控制无响应 | 运动主机 network.toml 的回传地址、两端端口对应关系、配置后是否重启运动主机程序、本体实际状态 |
 | Lite3 雷达或相机无数据 | `host_ip` 与网卡实际地址、`lidar_ip`、USB 访问规则、驱动日志及相应组件状态 |
 | Lite3 找不到示例地图 | 首次改为建图模式；定位模式需指向自己保存且实际存在的地图 |
 | Client 离线 | 填的是机器人计算主机地址，Atlas、Executor 和 Liaison 已启动且网络可达 |
