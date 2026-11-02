@@ -221,126 +221,273 @@ Client 在另一台电脑时，按 Console 的提示允许其他机器连接，�
 
 ## 有实体机器人：安装并使用
 
-本体路线在已适配的实体机器人上运行 Robonix。以下以**云深处 Lite3 四足机器人**为例，使用 [Lite3 整机配置](https://hub.robonix.ai/package/robonix.robot.deep_robotics.lite3)。Console 和 Robonix 安装在机器人计算主机上，Client 安装在操作者电脑上。按示例完成后，应能连接机器人、查看状态并进行文本交互。其他本体按各自整机说明核对硬件、依赖和启动方式。
+本体路线在已适配的实体机器人上运行 Robonix。以下以**云深处 Lite3 四足机器人**为例，使用 [Lite3 整机配置](https://hub.robonix.ai/package/robonix.robot.deep_robotics.lite3)，按演示视频中的顺序完成安装、配置、构建与交互。其他本体按各自整机说明核对硬件、依赖和启动方式。
 
 ### 准备 Lite3 与机器人主机
 
-当前整机配置面向 Jetson 原生运行，使用 ROS 2 Humble，配套 **Livox MID-360 雷达和 Orbbec Gemini 330 系列 RGB-D 相机**。先核对实际设备与 [整机 README](https://github.com/syswonder/robot-deep_robotics-lite3)；Console 安装成功不会替代驱动、ROS 依赖和传感器标定。
+本示例在 Jetson 主机上原生运行，使用 ROS 2 Humble，配套 **Livox MID-360 雷达和 Orbbec Gemini 330 系列 RGB-D 相机**。Console 和 Robonix 安装在机器人计算主机上，Client 可安装在操作者电脑上。
 
 - 按厂家说明完成上电、联网、遥控和急停检查，预留平整、空旷的测试区域。
-- 确认机器人主机能够访问 Lite3 运动主机、雷达和相机，并能下载 GitHub 软件包及其依赖。
-- 准备 ROS 2 Humble 和各原语所需的系统依赖，核对 `/opt/ros/humble/setup.bash` 存在。
-- 准备 Hub 账户、模型地址、密钥和模型名。先使用文本交互；启用语音还需单独配置语音服务。
+- 确认机器人主机能够访问运动主机、雷达和相机，已准备 ROS 2 Humble、JetPack CUDA / PyTorch 环境及各软件包依赖。
+- 准备 [Hub 账户](https://hub.robonix.ai/auth/login)、模型服务地址、密钥和模型名；视频还使用了腾讯语音服务，需准备相应凭据。
 
-这份 Lite3 配置没有机械臂和夹爪，不提供抓取、搬运等操作。第一次启动先检查状态，完成定位和运动验证后再尝试导航。
+视频中从 Windows 通过 SSH 管理机器人。下文所有安装、设备准备、构建和启动命令都在**机器人主机的 Linux 终端**执行；SSH 转发在操作者电脑执行。主机用户名、地址、网卡名和目录均应换成自己的实际值。
 
-### 在机器人主机安装 Console
+### 安装 Console 并登录
 
-在机器人主机的终端中，以日常使用的普通用户执行，不要在整条命令前加 `sudo`：
+#### 在机器人主机安装
+
+以普通用户执行，不要在整条命令前加 `sudo`：
 
 ```bash
 curl -fsSL https://hub.robonix.ai/install | bash
 ```
 
-按提示阅读并接受协议、安装依赖和 Robonix，再填写 `VLM_BASE_URL`、`VLM_API_KEY`、`VLM_MODEL`。安装时跳过了模型设置，可以稍后在“设置 → 机器人环境变量”补填。
+按安装器提示阅读并接受协议；视频中使用 Tab 切换到 **Agree** 后继续。等待 Console 和 Robonix 安装完成，已有 Robonix 时会使用现有安装。
 
-<figure>
-  <img src={useBaseUrl('/img/hub/ranger-model-settings.png')} alt="Console 设置页中的模型地址、密钥和模型名" width="1736" height="739" loading="lazy" />
-  <figcaption>仿真和真机使用同一组模型设置，填写自己的服务地址、密钥和模型名。</figcaption>
-</figure>
+模型设置可以在安装时填写，也可像视频一样先跳过，之后在 Console“设置 → 机器人环境变量”填写 `VLM_BASE_URL`、`VLM_API_KEY` 和 `VLM_MODEL`。等待终端显示安装结果与访问地址。
 
-在机器人主机终端检查安装：
+#### 从操作者电脑访问
 
-```bash
-export PATH="$HOME/.local/bin:$HOME/.cargo/bin:$PATH"
-rbnx --version
-rbnx path root
-```
-
-两条命令应正常退出，分别显示程序版本和 Robonix 源码根目录。
-
-本机浏览器打开 [http://127.0.0.1:4880](http://127.0.0.1:4880)，使用 Hub 账户登录。从操作者电脑管理时，将 `ROBOT_USER` 替换为机器人主机的用户名、`ROBOT_HOST` 替换为其实际地址，建立隧道：
+将 `ROBOT_USER`、`ROBOT_HOST` 替换为机器人计算主机的用户名和地址，在操作者电脑终端建立隧道：
 
 ```bash
 ssh -N -L 4880:127.0.0.1:4880 ROBOT_USER@ROBOT_HOST
 ```
 
-保持终端打开，在操作者电脑访问同一本地地址。这个隧道只转发 Console 页面，Client 的连接需另外保证组件端口可达。
+保持终端打开，在浏览器访问 [http://127.0.0.1:4880](http://127.0.0.1:4880)，使用 Hub 账户登录。
 
-### 安装 Lite3 配置并检查本机参数
+本地 `4880` 已占用时，按视频改用 `4881`：
 
-在机器人 Console 的“目录 → 机器人”中搜索 `Lite3`，打开“云深处 Lite3 四足机器人”，核对包名 **`robonix.robot.deep_robotics.lite3`** 和真机说明，再点“安装”并确认目标部署。
+```bash
+ssh -N -L 4881:127.0.0.1:4880 ROBOT_USER@ROBOT_HOST
+```
+
+此时浏览器访问 [http://127.0.0.1:4881](http://127.0.0.1:4881)。这里改的是操作者电脑的转发端口，机器人端仍为 `4880`。这个隧道只转发 Console，Client 连接还需机器人组件端口可达。
+
+### 安装 Lite3 配置并修改参数
+
+#### 从目录选择 Lite3
+
+在 Console“目录 → 机器人”找到“云深处 Lite3 四足机器人”，核对包名 **`robonix.robot.deep_robotics.lite3`**，点“安装到这台机器人”，新建或选择对应部署。
 
 <figure>
-  <img src={useBaseUrl('/img/hub/console-install-confirm.png')} alt="Console 整机配置安装确认对话框" width="2048" height="1600" loading="lazy" />
-  <figcaption>安装确认界面示意。这里应显示 Lite3 的安装内容和目标目录，以实际页面为准。</figcaption>
+  <img src={useBaseUrl('/img/hub/lite3-video-catalog.webp')} alt="Console 中的云深处 Lite3 整机配置与安装按钮" width="720" height="780" loading="lazy" />
+  <figcaption>视频 02:08：选择 Lite3 整机配置，点击“安装到这台机器人”。</figcaption>
 </figure>
 
-安装完成后，进入“配置”逐项核对：
+记录本次部署目录。视频使用 `/home/nvidia/robonix-deployments/lite3`，这只是演示机器的路径，不是所有安装的固定位置；以自己的 Console 部署信息为准。后文用 `DEPLOYMENT_DIR` 表示该目录的绝对路径。
 
-| 配置位置 | 要检查的内容 |
+#### 首次运行改为建图模式
+
+打开“配置”，展开 `mapping`。没有已有地图时，将 `map_mode` 从 `localization` 改为 `mapping`，点“保存为新版本”，填写说明并确认差异。
+
+<figure>
+  <img src={useBaseUrl('/img/hub/lite3-video-mapping.webp')} alt="Lite3 的 mapping 配置中将 map_mode 改为 mapping" width="1340" height="900" loading="lazy" />
+  <figcaption>视频 02:35：首次运行切换到建图模式，再保存为新版本。</figcaption>
+</figure>
+
+`3f_full_lite3` 是示例地图 ID。新机器不能假定已经拥有这张地图；先建图并[保存自己的地图](#创建并保存室内地图)，之后再配置自己的定位地图 ID。
+
+#### 核对运动主机与雷达地址
+
+按视频顺序，先展开 `lite3_quadruped`，检查 `target_ip` 是否指向实际运动主机；再展开 `mid360_lidar`，检查：
+
+| 字段 | 填写内容 |
 |---|---|
-| `lite3_quadruped` | `target_ip` 为实际运动主机地址；核对 `target_port`、`local_port`、`app_port`，避免其他控制程序占用反馈端口 |
-| `mid360_lidar` | `lidar_ip` 与 `host_ip` 分别对应实际雷达和接收数据的主机网卡 |
-| `orbbec_camera` | 相机型号、彩色图与深度图配置匹配实际设备 |
-| 本体和导航配置 | `soma.yaml`、`urdf/Lite3.urdf` 的安装外参与实际标定一致；保留 Lite3 自己的导航参数和行为树 |
-| `mapping` | 默认使用 RTAB-Map，示例设为定位模式并引用 `3f_full_lite3`；这张地图需要在本机实际存在 |
-
-**第一次建图时**，将 `mapping.config.map_mode` 改为 `mapping`，不要尝试加载仓库中的示例地图 ID。等[保存自己的地图](#创建并保存室内地图)后，再配置 `map_mode: localization`、自己的 `map_id` 和相同的 `SCENE_MAP_ID`。
+| `lidar_ip` | 实际 MID-360 雷达地址；按设备配置或标签核对 |
+| `host_ip` | 机器人主机连接雷达的网卡地址；需与后面的网卡设置一致 |
 
 <figure>
-  <img src={useBaseUrl('/img/hub/console-configuration.png')} alt="Console 配置页的系统组件、软件包和参数分组" width="1008" height="805" loading="lazy" />
-  <figcaption>配置页操作示意；按上表核对 Lite3 的实际条目，不照抄截图中的机器人参数。</figcaption>
+  <img src={useBaseUrl('/img/hub/lite3-video-lidar.webp')} alt="Lite3 雷达配置中的 host_ip 与 lidar_ip" width="1340" height="965" loading="lazy" />
+  <figcaption>视频 03:00：核对主机网卡与雷达地址；截图中的数值仅作位置示意。</figcaption>
 </figure>
 
-修改完成后点“保存为新版本”，填写说明并检查差异。记录“设置”中本次 Lite3 部署目录的绝对路径，后续命令都在该目录运行。
+视频的主机网卡使用 `192.168.1.50`，雷达地址在准备过程中也有调整。填写自己设备的最终地址，不能照抄某一帧中的值。修改完成后保存新版本；同时核对相机型号、传感器安装外参和 Lite3 自己的导航参数。
+
+#### 填写模型设置
+
+在“设置 → 机器人环境变量”填写模型三项并保存，之后可使用右侧 AI 配置助手检查配置。密钥不写进部署清单或聊天正文。稍后直接运行 Lite3 脚本时，还需在 `.env` 中准备脚本读取的凭据。
+
+### 补齐依赖、相机权限与网络
+
+#### 安装 Zenoh 中间件
+
+在已配置 ROS 2 Humble 软件源的机器人主机终端执行：
+
+```bash
+sudo apt install ros-humble-rmw-zenoh-cpp
+```
+
+后面的 `.env` 和部署清单统一选择 `rmw_zenoh_cpp`，与视频中的运行方式一致。
+
+#### 准备场景服务的 CLIP 权重
+
+视频使用本机已缓存的 `ViT-B-32.pt`。先在终端运行 `rbnx path root`，取得 Robonix 源码目录；进入其中的 `system/scene`。安装器默认目录通常为：
+
+```bash
+cd "$HOME/.local/share/robonix-console/robonix/system/scene"
+test -s "$HOME/.cache/clip/ViT-B-32.pt"
+```
+
+第一条路径以 `rbnx path root` 的实际输出为准。第二条成功且无输出，表示缓存文件存在且非空；它不校验权重内容。确认缓存是已下载完整的正确权重后，按视频建立软链接：
+
+```bash
+mkdir -p rbnx-build/data/ultralytics/weights/clip
+ln -sf "$HOME/.cache/clip/ViT-B-32.pt" rbnx-build/data/ultralytics/weights/clip/ViT-B-32.pt
+```
+
+<figure>
+  <img src={useBaseUrl('/img/hub/lite3-video-clip.webp')} alt="终端与字幕中准备场景服务 CLIP 缓存软链接的命令" width="2065" height="455" loading="lazy" />
+  <figcaption>视频 04:00：复用已下载的 CLIP 权重缓存，完整命令见上方代码块。</figcaption>
+</figure>
+
+这一步只复用现有缓存，不会下载缺失的权重。没有缓存时先按场景服务构建流程下载并检查权重，不能把空链接当成准备完成。
+
+#### 安装传感器与导航依赖
+
+按视频补齐点云转换、Orbbec 相机以及建图、导航相关 ROS 包：
+
+```bash
+sudo apt-get install -y \
+  ros-humble-pointcloud-to-laserscan \
+  ros-humble-orbbec-camera
+
+sudo apt-get install -y \
+  ros-humble-rtabmap-ros \
+  ros-humble-imu-filter-madgwick \
+  ros-humble-nav2-bringup \
+  ros-humble-navigation2
+```
+
+安装失败时先处理软件源或具体依赖报错，不继续启动。
+
+#### 添加相机 udev 规则
+
+相机驱动安装后，执行：
+
+```bash
+sudo cp /opt/ros/humble/share/orbbec_camera/udev/99-obsensor-libusb.rules /etc/udev/rules.d/
+sudo udevadm control --reload-rules
+sudo udevadm trigger --action=add --subsystem-match=usb
+```
+
+这是视频中为相机补齐 USB 访问规则的步骤。源文件不存在时先检查 `ros-humble-orbbec-camera` 是否安装成功。
+
+视频接着将登录用户加入已有的 Docker 组；使用 Docker 时，将下面的 `ROBOT_USER` 替换为实际 Linux 用户名：
+
+```bash
+sudo usermod -aG docker ROBOT_USER
+```
+
+完成后重新建立 SSH 会话或重启主机，使组成员关系生效。不要把视频中的用户名 `nvidia` 用到其他账户。
+
+#### 设置机器人主机网卡
+
+先列出连接，确定连向机器人和雷达的有线连接与接口：
+
+```bash
+nmcli con show
+```
+
+视频使用连接名 `Wired connection 1`、接口 `eno1` 和地址 `192.168.1.50/24`。仅在实际网络规划相同时使用下面的值；其他机器替换连接名、接口和地址，并保持与 `mid360_lidar.host_ip` 一致。
+
+```bash
+sudo nmcli con mod "Wired connection 1" ipv4.addresses 192.168.1.50/24
+sudo nmcli con up "Wired connection 1"
+ip addr show eno1
+```
+
+检查输出中是否有预期地址。更改正在承载 SSH 的连接可能断开会话，应先确认有可用的本机或其他管理连接。
+
+<figure>
+  <img src={useBaseUrl('/img/hub/lite3-video-network.webp')} alt="视频中设置机器人主机有线网卡地址的命令" width="2050" height="455" loading="lazy" />
+  <figcaption>视频 05:00：检查有线连接并设置网卡地址，需与 host_ip 对应。</figcaption>
+</figure>
 
 ### 准备凭据并构建 Lite3 软件包
 
-Lite3 仓库提供 `build.sh`、`start.sh` 和 `stop.sh`。其中启动脚本还处理 ROS 环境、通信进程和启动前清理，本示例使用这组脚本，不将 Console“启动”按钮视为它的完整替代。
+#### 设置命令路径
 
-将 `DEPLOYMENT_DIR` 替换为上一步记录的 **Lite3 部署目录**，在机器人主机终端进入该目录。首次创建本机配置时执行：
+将 `DEPLOYMENT_DIR` 替换为本次 Lite3 部署目录，进入后按视频把 `rbnx` 的常用安装位置加入 Bash 路径：
 
 ```bash
 cd "DEPLOYMENT_DIR"
-cp -n .env.example .env
+echo 'export PATH="$HOME/.local/bin:$HOME/.cargo/bin:$PATH"' >> ~/.bashrc
+source ~/.bashrc
+rbnx --version
+rbnx path root
+```
+
+路径设置只需添加一次。后两条分别检查程序版本和已登记的源码根目录，均应正常退出。
+
+#### 创建并填写本机配置
+
+在同一部署目录首次创建 `.env`，已有文件时保留原内容并编辑：
+
+```bash
+test -f .env || cp .env.example .env
 nano .env
 ```
 
-`cp -n` 保留已有 `.env`；`nano` 可换为你熟悉的编辑器。填入模型的三项实际值。脚本直接运行时会读取这里的配置，不应假定 Console 中保存的本机变量会自动进入这个终端。`.env` 不提交到仓库，也不随配置备份分享。
+填写 `VLM_BASE_URL`、`VLM_API_KEY`、`VLM_MODEL`。视频保留腾讯语音，还需填写 `TENCENT_ASR_APPID`、`TENCENTCLOUD_SECRET_ID`、`TENCENTCLOUD_SECRET_KEY`。脚本会读取这个本机文件，不应假定 Console 中的变量已自动进入终端；`.env` 不提交到仓库。
 
-当前清单启用了腾讯语音，保留它时还需填写 `TENCENT_ASR_APPID`、`TENCENTCLOUD_SECRET_ID`、`TENCENTCLOUD_SECRET_KEY`；仅做文本测试时，可在 Console 停用 `speech` 服务并保存。不要留着启用的服务却缺少必填凭据。
+将以下两项改为视频使用的 Zenoh，核对部署清单环境变量中的 `RMW_IMPLEMENTATION` 也为 `rmw_zenoh_cpp`：
 
-核对 `.env` 中的 ROS 中间件设置：示例文件使用 Fast DDS，而清单的默认值是 Zenoh。按本机已安装的中间件，统一 `.env` 中的 `RMW_IMPLEMENTATION`、`ROBONIX_RMW_IMPLEMENTATION` 和清单环境变量中的 `RMW_IMPLEMENTATION`，例如选择 Fast DDS 时均设为 `rmw_fastrtps_cpp`，不能让各组件混用。
-
-在同一目录构建：
-
-```bash
-bash build.sh
+```dotenv
+RMW_IMPLEMENTATION=rmw_zenoh_cpp
+ROBONIX_RMW_IMPLEMENTATION=rmw_zenoh_cpp
 ```
 
-保持网络畅通，等待依赖下载和构建结束。检查构建汇总，确认失败数为 `0`；失败时保留日志并先处理第一个报错。构建耗时取决于主机、网络和缓存。
+#### 构建并检查汇总
 
-### 启动 Lite3 并检查日志
-
-确认测试区域已清空、急停可用，机器人已按厂家要求做好运行准备，在同一部署目录执行：
+在 Lite3 部署根目录执行：
 
 ```bash
-bash start.sh
+./build.sh
 ```
 
-真机不需要启动 MuJoCo，也不运行 `sim/start.sh`。保持终端打开，查看启动输出和部署目录下 `rbnx-boot/logs/` 的组件日志；确认底盘、雷达、相机以及所需服务注册成功，再连接 Client。
+保持网络畅通，等待构建结束。检查汇总中的 `Failed: 0`；有失败时保留日志并先处理第一个报错。
 
 <figure>
-  <img src={useBaseUrl('/img/hub/console-logs.png')} alt="Console 日志页的运行记录和组件标签" width="1458" height="680" loading="lazy" />
-  <figcaption>日志界面示意：Console 管理的运行可按记录和组件查看。上述脚本运行先以终端及部署目录中的日志为准，不假定会出现在同一条 Console 运行记录中。</figcaption>
+  <img src={useBaseUrl('/img/hub/lite3-video-build.webp')} alt="Lite3 构建汇总显示 Built 12 与 Failed 0" width="1965" height="480" loading="lazy" />
+  <figcaption>视频 06:30：构建完成，汇总中 Failed 为 0。</figcaption>
 </figure>
 
-结束本次运行时，在同一部署目录的另一终端执行 `bash stop.sh`。它还会清理属于本部署的残留进程并检查 Lite3 反馈端口；不要同时从 Console 再启动一套部署。
+### 启动 Lite3 并检查能力
+
+确认测试区域已清空、急停可用，在同一部署根目录执行：
+
+```bash
+./start.sh
+```
+
+保持终端打开，查看启动输出。Lite3 的启动脚本会加载 `.env` 与 ROS 环境，并处理通信进程和启动前清理。真机不需要启动 MuJoCo，也不运行 `sim/start.sh`；不要同时从 Console 再启动一套部署。
+
+在机器人主机另开终端，按视频先查看能力列表：
+
+```bash
+rbnx caps
+```
+
+检查底盘、雷达、相机及所需服务是否已注册。视频中的列表仍有 `namespace mismatch` 等提示，遇到时需核对能力命名空间与部署配置，不能据此宣称所有组件都已通过验证。结合 `rbnx-boot/logs/` 中的组件日志确认状态。能力条目存在不等于现场动作已经完成。
+
+<figure>
+  <img src={useBaseUrl('/img/hub/lite3-video-caps.webp')} alt="rbnx caps 显示 Lite3 组件的能力与注册状态" width="1355" height="280" loading="lazy" />
+  <figcaption>视频 07:19：查看能力和状态；逐项检查异常提示，不能只看命令已返回。</figcaption>
+</figure>
+
+接着可在终端执行视频演示的交互命令：
+
+```bash
+rbnx chat
+```
+
+先询问当前能力，再进行已验证的操作。结束部署时，在同一部署目录的另一终端执行 `./stop.sh`；该脚本会清理本部署进程并检查反馈端口。
 
 ### 安装 Client 并连接 Lite3
 
-在操作者电脑准备 Python 3.11 或更高版本，打开保存源码的目录。以下以 Linux / macOS 的文本交互为例：
+视频最后切换到 Robonix Client。尚未安装时，在操作者电脑准备 Python 3.11 或更高版本，按 [Client 仓库说明](https://github.com/syswonder/robonix-client#install-guide)安装。以下以 Linux / macOS 的文本交互为例：
 
 ```bash
 git clone https://github.com/syswonder/robonix-client.git
@@ -351,18 +498,19 @@ pip install -e .
 robonix-client --robot-host ROBOT_HOST
 ```
 
-`ROBOT_HOST` 替换为**机器人计算主机**的实际地址，不是操作者电脑或 Lite3 运动主机的地址。Client 已安装时，只需激活原虚拟环境并运行最后一条命令。
+`ROBOT_HOST` 填机器人计算主机的实际地址，不是操作者电脑或 Lite3 运动主机地址。已安装时只需激活原虚拟环境并运行最后一条命令。
 
-在操作者电脑打开 [http://127.0.0.1:7860](http://127.0.0.1:7860)，核对 **Robot Host**，**Atlas Port** 默认 `50051`，**Liaison Endpoint** 留空，点 **Connect**。两台电脑之间需能访问 Atlas、Executor 和 Liaison；当前 Lite3 清单默认端口分别为 `50051`、`50061` 和 `50081`，仅在可信局域网或 Tailscale 网络中使用。
+打开 [http://127.0.0.1:7860](http://127.0.0.1:7860)，核对 **Robot Host**，**Atlas Port** 默认 `50051`，**Liaison Endpoint** 留空，点 **Connect**。Atlas、Executor 和 Liaison 的端口需可达，当前清单默认分别为 `50051`、`50061` 和 `50081`，仅在可信局域网或 Tailscale 网络使用。
 
 <figure>
-  <img src={useBaseUrl('/img/hub/client-connected.png')} alt="Client 中的机器人地址、Atlas 端口和连接状态" width="2048" height="680" loading="lazy" />
-  <figcaption>连接界面示意。用 Lite3 主机的实际地址替换截图地址，确认连接成功。</figcaption>
+  <img src={useBaseUrl('/img/hub/lite3-video-client.webp')} alt="Robonix Client 中 Lite3 的站立和坐下请求及执行记录" width="2568" height="1015" loading="lazy" />
+  <figcaption>视频 08:30：Client 连接后发送姿态请求，并查看执行记录。</figcaption>
 </figure>
 
-先发“请列出当前可用能力，不要移动机器人”，检查响应；再在 **Vitals** 查看可用的硬件和模块状态。后续移动任务需先完成地图、定位与现场检查，不以模型回复代替实际状态。
+视频中通过 Client 发送站立、坐下请求，并展示执行记录。进行姿态测试前确保现场安全、急停可用；检查请求执行状态，再对照本体姿态确认结果，不把模型回复当作实际动作证明。这份 Lite3 配置没有机械臂和夹爪，不提供抓取、搬运等操作。
 
-需要语音时，按 [Client 安装说明](https://github.com/syswonder/robonix-client#install-guide)补装 `audio` 依赖和系统音频库，再在 **Audio** 将输入、输出提供方选为 `audio_client_bridge`。该部署的桥接端口为 `60002`，腾讯语音凭据也需已配置。
+需要语音时，按 Client 说明补装 `audio` 依赖和系统音频库，核对腾讯凭据，在 **Audio** 将输入、输出提供方选为 `audio_client_bridge`。桥接端口为 `60002`；先确认文本交互正常，再检查音频链路。
+
 
 ## 运行之后：建图、导航与场景
 
@@ -586,7 +734,8 @@ curl -fsSL https://hub.robonix.ai/install | bash -s -- --uninstall
 | 找不到 `rbnx` 或源码 | 安装报错、终端 PATH，以及 `rbnx --version`、`rbnx path root` 的结果 |
 | Ranger 更新软件包失败 | 网络、Docker 权限和“更新”页任务日志中的第一个报错 |
 | MuJoCo 窗口不出现 | 是否在正确部署目录运行脚本，X11 / WSLg 与硬件 OpenGL 是否可用 |
-| Lite3 构建或启动失败 | ROS 2 Humble、原语依赖、`.env`、中间件一致性、设备地址及反馈端口占用 |
+| Lite3 构建或启动失败 | ROS 2 Humble、Zenoh 依赖与配置、CLIP 权重、相机 udev 规则、`.env`、设备地址及反馈端口占用 |
+| Lite3 雷达或相机无数据 | `host_ip` 与网卡实际地址、`lidar_ip`、USB 访问规则、驱动日志及相应组件状态 |
 | Lite3 找不到示例地图 | 首次改为建图模式；定位模式需指向自己保存且实际存在的地图 |
 | Client 离线 | 填的是机器人计算主机地址，Atlas、Executor 和 Liaison 已启动且网络可达 |
 | 模型或语音不可用 | 模型地址、密钥、模型名和网络；语音另查腾讯凭据、Client 音频依赖及桥接端口 |
