@@ -206,7 +206,7 @@ robonix-client --robot-host 127.0.0.1
 
 打开 [http://127.0.0.1:7860](http://127.0.0.1:7860)，将 **Robot Host** 填为 Robonix 所在电脑的地址，同机运行使用 `127.0.0.1`；**Atlas Port** 填 Console 概览显示的端口，**Liaison Endpoint** 通常留空，点 **Connect** 等待在线。然后在 Chat 中输入一条简单文本任务并发送，查看响应。
 
-Client 在另一台电脑时，按 Console 的提示允许其他机器连接，保存并重启 Robonix，确保 Atlas 和发现的组件可达。更多平台安装与连接说明见 [Client README](https://github.com/syswonder/robonix-client#install-guide)。
+Client 在另一台电脑时，按 Console 的提示点“允许其他机器连接”并确认。Console 会自动修改相应组件的监听地址并保存为新版本，重启 Robonix 后生效。仅在可信网络中使用，并确保 Atlas 和发现的组件可达。更多平台安装与连接说明见 [Client README](https://github.com/syswonder/robonix-client#install-guide)。
 
 ### 观看安装与仿真部署演示
 
@@ -231,7 +231,7 @@ Client 在另一台电脑时，按 Console 的提示允许其他机器连接，�
 - 确认机器人主机能够访问运动主机、雷达和相机，已准备 ROS 2 Humble、JetPack CUDA / PyTorch 环境及各软件包依赖。
 - 准备 [Hub 账户](https://hub.robonix.ai/auth/login)、模型服务地址、密钥和模型名；本示例启用腾讯语音服务，还需准备相应凭据。
 
-可从操作者电脑通过 SSH 管理机器人。下文所有安装、设备准备、构建和启动命令都在**机器人主机的 Linux 终端**执行；SSH 转发在操作者电脑执行。主机用户名、地址、网卡名和目录均应换成自己的实际值。
+可从操作者电脑通过 SSH 管理机器人。除明确注明在操作者电脑或运动主机执行的步骤外，下文安装、设备准备、构建和启动命令均在**机器人计算主机的 Linux 终端**执行；SSH 转发在操作者电脑执行。主机用户名、地址、网卡名和目录均应换成自己的实际值。
 
 ### 安装 Console 并登录
 
@@ -330,7 +330,15 @@ sudo apt install ros-humble-rmw-zenoh-cpp
 
 #### 准备场景服务的 CLIP 权重
 
-场景服务需要 CLIP 权重 `ViT-B-32.pt`。本机已有完整缓存时，可以通过软链接复用。先在终端运行 `rbnx path root`，取得 Robonix 源码目录；进入其中的 `system/scene`。安装器默认目录通常为：
+场景服务需要 CLIP 权重 `ViT-B-32.pt`。本机已有完整缓存时，可以通过软链接复用。先在机器人计算主机的终端检查 Robonix，取得源码目录：
+
+```bash
+export PATH="$HOME/.local/bin:$HOME/.cargo/bin:$PATH"
+rbnx --version
+rbnx path root
+```
+
+两条 `rbnx` 命令均应正常退出。进入输出目录中的 `system/scene`；安装器默认目录通常为：
 
 ```bash
 cd "$HOME/.local/share/robonix-console/robonix/system/scene"
@@ -765,7 +773,9 @@ Console 右侧的“AI 机器人配置助手”用于读配置、查软件包、
 |---|---|
 | Console | “更新”页检查版本；自动更新保留部署、历史与日志，不更新机器人软件包 |
 | Robonix | 在“更新”选择发布版本或提交 ID，按页面执行升级；流程会停止 Robonix、切换源码、编译并重建软件包，完成后重新验证 |
-| 软件包 | 核对当前部署与来源；Ranger 在 Console 更新全部软件包，Lite3 按整机脚本重新构建并检查结果 |
+| 软件包 | 在“更新”页核对当前部署、来源及可更新版本；更新远程软件包后检查构建结果，Lite3 还需按整机脚本在本机环境中构建、验证 |
+
+重新构建不等于更新代码。本机目录包需另外更新源文件；固定版本或提交的包，需先明确要使用的版本，再更新配置和构建。
 
 Console 在启动时和此后每 6 小时检查更新；协议变化、构建或升级任务进行中、关闭自动更新时，需按页面提示处理。升级前保留可用配置，并先结束通过脚本启动的 Lite3 运行；配置回滚不能撤销代码升级。
 
