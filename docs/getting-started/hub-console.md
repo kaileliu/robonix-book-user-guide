@@ -82,23 +82,6 @@ curl -fsSL https://hub.robonix.ai/install | bash
   <figcaption>等待终端给出安装结果和管理页面地址；失败时保留报错和构建日志。</figcaption>
 </figure>
 
-#### 设置模型服务
-
-按提示填写模型服务的三个字段。密钥输入时不会直接显示；不要把密钥写进公开仓库或截图。
-
-| 字段 | 变量 | 填写内容 |
-|---|---|---|
-| VLM 终端 URL | `VLM_BASE_URL` | 模型服务的 Chat Completions 兼容接口地址 |
-| VLM KEY | `VLM_API_KEY` | 该服务的访问密钥 |
-| VLM 模型 | `VLM_MODEL` | 支持图像理解和工具调用的模型名 |
-
-安装时跳过了这些字段，或需要修改时，打开 Console“设置 → 机器人环境变量”，添加这三项并保存。本机已有值时，安装器会询问是否保留，核对后选择。
-
-<figure>
-  <img src={useBaseUrl('/img/hub/ranger-model-settings.png')} alt="Console 设置页中的模型地址、密钥和模型名" width="1736" height="739" loading="lazy" />
-  <figcaption>在“设置 → 机器人环境变量”填写①中的三项，模型地址与模型名以你使用的服务为准。</figcaption>
-</figure>
-
 #### 登录本机 Console
 
 安装结束后，在同一台电脑浏览器打开 [http://127.0.0.1:4880](http://127.0.0.1:4880)。填写 Hub 邮箱和密码，点“登录”；有两步验证时继续输入验证码。若提示尚未同意协议，先在 Hub 完成确认，再返回登录。
@@ -106,6 +89,23 @@ curl -fsSL https://hub.robonix.ai/install | bash
 <figure className={styles.compactFigure}>
   <img src={useBaseUrl('/img/hub/hub-account-login-register.png')} alt="Hub 账户页面中的邮箱密码登录与注册入口" width="453" height="484" loading="lazy" />
   <figcaption>图为 Hub 账户登录与注册入口；Console 使用同一 Hub 账户。完成本机 Console 登录后，应能进入概览和配置页面。</figcaption>
+</figure>
+
+#### 设置模型服务
+
+登录 Console 后，打开“设置 → 机器人环境变量”，填写模型服务的三个字段。密钥输入时不会直接显示；不要把密钥写进公开仓库或截图。
+
+| 字段 | 变量 | 填写内容 |
+|---|---|---|
+| VLM 终端 URL | `VLM_BASE_URL` | 模型服务的 Chat Completions 兼容接口地址 |
+| VLM KEY | `VLM_API_KEY` | 该服务的访问密钥 |
+| VLM 模型 | `VLM_MODEL` | 支持图像理解和工具调用的模型名 |
+
+填写或核对这三项后保存。安装时已经填写过的值也应在此检查，确认地址、密钥和模型名属于同一服务。
+
+<figure>
+  <img src={useBaseUrl('/img/hub/ranger-model-settings.png')} alt="Console 设置页中的模型地址、密钥和模型名" width="1736" height="739" loading="lazy" />
+  <figcaption>在“设置 → 机器人环境变量”填写①中的三项，模型地址与模型名以你使用的服务为准。</figcaption>
 </figure>
 
 ### 安装 Ranger 配置并完成构建
