@@ -16,6 +16,7 @@ const sidebars: SidebarsConfig = {
         'getting-started/hub-console',
         'getting-started/quickstart',
         'getting-started/client',
+        {type: 'doc', id: 'getting-started/hub-console-review', label: 'Console 使用指南（评审预览）'},
       ],
     },
     {
