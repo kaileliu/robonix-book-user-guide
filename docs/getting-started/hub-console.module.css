@@ -45,13 +45,6 @@
   max-width: min(100%, 420px);
 }
 
-.guide video {
-  display: block;
-  max-height: 560px;
-  margin: 1.5rem 0 0.75rem;
-  background: #111;
-  border-radius: 8px;
-}
 
 @media (max-width: 576px) {
   .guide h2 {
