@@ -1,0 +1,108 @@
+{
+  "source": "RobonixHub内测使用手册-20261003-01.pdf",
+  "sha256": "490f425c6cfdce1cc566aaafc50de8e7560240bafb7fbf93940248a3167faa64",
+  "images": [
+    {
+      "file": "static/img/hub/manual/install.webp",
+      "pdf_page": 6,
+      "image_on_page": 1
+    },
+    {
+      "file": "static/img/hub/manual/login.webp",
+      "pdf_page": 7,
+      "image_on_page": 1
+    },
+    {
+      "file": "static/img/hub/manual/variables.webp",
+      "pdf_page": 25,
+      "image_on_page": 1
+    },
+    {
+      "file": "static/img/hub/manual/catalog.webp",
+      "pdf_page": 8,
+      "image_on_page": 1
+    },
+    {
+      "file": "static/img/hub/manual/robot-package.webp",
+      "pdf_page": 8,
+      "image_on_page": 2
+    },
+    {
+      "file": "static/img/hub/manual/parameters.webp",
+      "pdf_page": 11,
+      "image_on_page": 1
+    },
+    {
+      "file": "static/img/hub/manual/provider.webp",
+      "pdf_page": 11,
+      "image_on_page": 2
+    },
+    {
+      "file": "static/img/hub/manual/add-package.webp",
+      "pdf_page": 13,
+      "image_on_page": 1
+    },
+    {
+      "file": "static/img/hub/manual/save-version.webp",
+      "pdf_page": 13,
+      "image_on_page": 2
+    },
+    {
+      "file": "static/img/hub/manual/packages.webp",
+      "pdf_page": 14,
+      "image_on_page": 1,
+      "crop": [
+        0,
+        0,
+        1568,
+        1050
+      ]
+    },
+    {
+      "file": "static/img/hub/manual/running.webp",
+      "pdf_page": 15,
+      "image_on_page": 1
+    },
+    {
+      "file": "static/img/hub/manual/logs.webp",
+      "pdf_page": 16,
+      "image_on_page": 1
+    },
+    {
+      "file": "static/img/hub/manual/client.webp",
+      "pdf_page": 17,
+      "image_on_page": 1
+    },
+    {
+      "file": "static/img/hub/manual/task.webp",
+      "pdf_page": 17,
+      "image_on_page": 2
+    },
+    {
+      "file": "static/img/hub/manual/history.webp",
+      "pdf_page": 18,
+      "image_on_page": 1
+    },
+    {
+      "file": "static/img/hub/manual/backup.webp",
+      "pdf_page": 19,
+      "image_on_page": 1
+    },
+    {
+      "file": "static/img/hub/manual/assistant.webp",
+      "pdf_page": 21,
+      "image_on_page": 3,
+      "crop": [
+        0,
+        745,
+        768,
+        1665
+      ]
+    },
+    {
+      "file": "static/img/hub/manual/feedback.webp",
+      "pdf_page": 3,
+      "image_on_page": 1
+    }
+  ]
+}
