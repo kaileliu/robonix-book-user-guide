@@ -5,104 +5,182 @@
     {
       "file": "static/img/hub/manual/install.webp",
       "pdf_page": 6,
-      "image_on_page": 1
+      "image_on_page": 1,
+      "dimensions": [
+        1251,
+        1026
+      ],
+      "extraction": "complete embedded image; no additional crop; lossless WebP"
     },
     {
       "file": "static/img/hub/manual/login.webp",
       "pdf_page": 7,
-      "image_on_page": 1
+      "image_on_page": 1,
+      "dimensions": [
+        1400,
+        680
+      ],
+      "extraction": "complete embedded image; no additional crop; lossless WebP"
     },
     {
       "file": "static/img/hub/manual/variables.webp",
       "pdf_page": 25,
-      "image_on_page": 1
+      "image_on_page": 1,
+      "dimensions": [
+        1240,
+        995
+      ],
+      "extraction": "complete embedded image; no additional crop; lossless WebP"
     },
     {
       "file": "static/img/hub/manual/catalog.webp",
       "pdf_page": 8,
-      "image_on_page": 1
+      "image_on_page": 1,
+      "dimensions": [
+        1498,
+        680
+      ],
+      "extraction": "complete embedded image; no additional crop; lossless WebP"
     },
     {
       "file": "static/img/hub/manual/robot-package.webp",
       "pdf_page": 8,
-      "image_on_page": 2
+      "image_on_page": 2,
+      "dimensions": [
+        1400,
+        680
+      ],
+      "extraction": "complete embedded image; no additional crop; lossless WebP"
     },
     {
       "file": "static/img/hub/manual/parameters.webp",
       "pdf_page": 11,
-      "image_on_page": 1
+      "image_on_page": 1,
+      "dimensions": [
+        1240,
+        691
+      ],
+      "extraction": "complete embedded image; no additional crop; lossless WebP"
     },
     {
       "file": "static/img/hub/manual/provider.webp",
       "pdf_page": 11,
-      "image_on_page": 2
+      "image_on_page": 2,
+      "dimensions": [
+        1240,
+        680
+      ],
+      "extraction": "complete embedded image; no additional crop; lossless WebP"
     },
     {
       "file": "static/img/hub/manual/add-package.webp",
       "pdf_page": 13,
-      "image_on_page": 1
+      "image_on_page": 1,
+      "dimensions": [
+        1680,
+        680
+      ],
+      "extraction": "complete embedded image; no additional crop; lossless WebP"
     },
     {
       "file": "static/img/hub/manual/save-version.webp",
       "pdf_page": 13,
-      "image_on_page": 2
+      "image_on_page": 2,
+      "dimensions": [
+        2048,
+        832
+      ],
+      "extraction": "complete embedded image; no additional crop; lossless WebP"
     },
     {
       "file": "static/img/hub/manual/packages.webp",
       "pdf_page": 14,
       "image_on_page": 1,
-      "crop": [
-        0,
-        0,
+      "dimensions": [
         1568,
-        1050
-      ]
+        2128
+      ],
+      "extraction": "complete embedded image; no additional crop; lossless WebP"
     },
     {
       "file": "static/img/hub/manual/running.webp",
       "pdf_page": 15,
-      "image_on_page": 1
+      "image_on_page": 1,
+      "dimensions": [
+        2048,
+        864
+      ],
+      "extraction": "complete embedded image; no additional crop; lossless WebP"
     },
     {
       "file": "static/img/hub/manual/logs.webp",
       "pdf_page": 16,
-      "image_on_page": 1
+      "image_on_page": 1,
+      "dimensions": [
+        1458,
+        680
+      ],
+      "extraction": "complete embedded image; no additional crop; lossless WebP"
     },
     {
       "file": "static/img/hub/manual/client.webp",
       "pdf_page": 17,
-      "image_on_page": 1
+      "image_on_page": 1,
+      "dimensions": [
+        2048,
+        680
+      ],
+      "extraction": "complete embedded image; no additional crop; lossless WebP"
     },
     {
       "file": "static/img/hub/manual/task.webp",
       "pdf_page": 17,
-      "image_on_page": 2
+      "image_on_page": 2,
+      "dimensions": [
+        1960,
+        1092
+      ],
+      "extraction": "complete embedded image; no additional crop; lossless WebP"
     },
     {
       "file": "static/img/hub/manual/history.webp",
       "pdf_page": 18,
-      "image_on_page": 1
+      "image_on_page": 1,
+      "dimensions": [
+        1400,
+        680
+      ],
+      "extraction": "complete embedded image; no additional crop; lossless WebP"
     },
     {
       "file": "static/img/hub/manual/backup.webp",
       "pdf_page": 19,
-      "image_on_page": 1
+      "image_on_page": 1,
+      "dimensions": [
+        1568,
+        680
+      ],
+      "extraction": "complete embedded image; no additional crop; lossless WebP"
     },
     {
       "file": "static/img/hub/manual/assistant.webp",
       "pdf_page": 21,
       "image_on_page": 3,
-      "crop": [
-        0,
-        745,
+      "dimensions": [
         768,
-        1665
-      ]
+        1800
+      ],
+      "extraction": "complete embedded image; no additional crop; lossless WebP"
     },
     {
       "file": "static/img/hub/manual/feedback.webp",
       "pdf_page": 3,
-      "image_on_page": 1
+      "image_on_page": 1,
+      "dimensions": [
+        1680,
+        1232
+      ],
+      "extraction": "complete embedded image; no additional crop; lossless WebP"
     }
   ]
 }
